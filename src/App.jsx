@@ -1,27 +1,37 @@
-import React, { Suspense, useRef } from 'react';
+import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useHelper } from '@react-three/drei';
-import Car from './Components/Car';
-import { DirectionalLightHelper } from 'three';
+import { OrbitControls } from '@react-three/drei';
+import Lights from './Components/Lights';
+import Cars from './Components/Cars';
+import Map from './Components/Map';
 
 function App() {
-  const light = useRef();
-  useHelper(light, DirectionalLightHelper, 'cyan');
+  const aspectRatio = window.innerWidth / window.innerHeight;
+  const cameraWidth = 2000;
+  const cameraHeight = cameraWidth / aspectRatio;
 
   return (
-    <div className="w-full h-full bg-purple-900 pt-10 pb-10">
-      <Canvas camera={{ position: [0, 0, 7] }}>
+    <div className="w-full h-full bg-purple-900 ">
+      <Canvas
+        orthographic
+        camera={{
+          position: [0, 300, -210],
+          aspect: aspectRatio,
+          left: cameraWidth / -2,
+          right: cameraWidth / 2,
+          top: cameraHeight / 2,
+          bottom: cameraHeight / -2,
+          near: 0,
+          far: 1000,
+          zoom: 1.2,
+        }}
+      >
+        {/* <gridHelper args={[10, 10, 'blue', 'black']} rotation={[0, 0, 0]} /> */}
         <OrbitControls />
-        <ambientLight visible={true} intensity={0.5} />
-        <directionalLight
-          visible={true}
-          position={[1, 1, 1]}
-          intensity={1}
-          color="blue"
-          ref={light}
-        />
+        <Lights />
         <Suspense fallback={null}>
-          <Car />
+          <Cars />
+          <Map mapWidth={cameraWidth} mapHeight={cameraHeight * 2} />
         </Suspense>
       </Canvas>
     </div>
