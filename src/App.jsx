@@ -4,11 +4,14 @@ import { OrbitControls } from '@react-three/drei';
 import Lights from './Components/Lights';
 import Cars from './Components/Cars';
 import Map from './Components/Map';
+import { useGameContext } from './context/GameContext';
 
 function App() {
   const aspectRatio = window.innerWidth / window.innerHeight;
   const cameraWidth = 2000;
   const cameraHeight = cameraWidth / aspectRatio;
+
+  const { resetGame } = useGameContext();
 
   return (
     <div className="w-full h-full bg-purple-900 ">
