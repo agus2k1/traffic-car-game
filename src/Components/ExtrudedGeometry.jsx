@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ExtrudedGeometry({ shape, color1, color2 }) {
+function ExtrudedGeometry({ shape }) {
   return (
     <mesh rotation={[-1.57, 0, 0]}>
       <extrudeGeometry
