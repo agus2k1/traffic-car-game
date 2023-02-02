@@ -1,45 +1,8 @@
-import React from 'react';
-import redCarProps from '../assets/CarsData';
-import { getCarFrontTexture, getCarSideTexture } from '../assets/CarsTextures';
-
-const CarParts = ({ props }) => {
-  const { backWheelPosition, frontWheelPosition, wheelArgs, wheelColor } =
-    props.wheels;
-  const { mainPosition, mainArgs, mainColor } = props.main;
-  const { cabinPosition, cabinArgs, cabinColor } = props.cabin;
-  console.log((1 / 3) * Math.PI);
-
-  return (
-    <>
-      {/* Back Wheel */}
-      <mesh position={backWheelPosition}>
-        <boxGeometry attach="geometry" args={wheelArgs} />
-        <meshLambertMaterial color={wheelColor} />
-      </mesh>
-      {/* Front Wheel */}
-      <mesh position={frontWheelPosition}>
-        <boxGeometry attach="geometry" args={wheelArgs} />
-        <meshLambertMaterial color={wheelColor} />
-      </mesh>
-      {/* Main */}
-      <mesh position={mainPosition}>
-        <boxGeometry attach="geometry" args={mainArgs} />
-        <meshLambertMaterial color={mainColor} />
-      </mesh>
-      {/* Cabin */}
-      <mesh position={cabinPosition}>
-        <boxGeometry attach="geometry" args={cabinArgs} />
-        <meshLambertMaterial attach="material-0" map={getCarFrontTexture()} />
-        <meshLambertMaterial attach="material-1" map={getCarFrontTexture()} />
-        <meshLambertMaterial attach="material-2" color={cabinColor} />
-        <meshLambertMaterial attach="material-3" color={cabinColor} />
-        <meshLambertMaterial attach="material-4" map={getCarSideTexture()} />
-        <meshLambertMaterial attach="material-5" map={getCarSideTexture()} />
-        {/* <canvasTexture attach="map" image={getCarSideTexture()} /> */}
-      </mesh>
-    </>
-  );
-};
+import React, { useState, useEffect } from 'react';
+import Car from './Vehicles/Car';
+import Truck from './Vehicles/Truck';
+import { carProps, truckProps } from '../assets/CarsData';
+import { useGameContext } from '../context/GameContext';
 
 const CreateCar = ({ name, children, position }) => {
   return (
@@ -50,12 +13,56 @@ const CreateCar = ({ name, children, position }) => {
 };
 
 const Cars = () => {
+  const { resetGame } = useGameContext();
+  const [playerAngleMoved, setPlayerAngleMoved] = useState(0);
+  const [otherVehicles, setOtherVehicles] = useState([
+    {
+      name: 'greenCar',
+      type: 'car',
+      props: carProps,
+      color: 0x1f9c32,
+      position: [-160, 0, 220],
+    },
+  ]);
+
+  useEffect(() => {
+    setPlayerAngleMoved(0);
+    // setOtherVehicles([]);
+    let lastTimestamp = undefined;
+  }, []);
+
   return (
-    <CreateCar
-      name={'car'}
-      children={<CarParts props={redCarProps} />}
-      position={[150, 0, 220]} // change
-    />
+    <>
+      <CreateCar
+        name={'playerCar'}
+        children={<Car props={carProps} color={0xa52523} />}
+        position={[150, 0, 220]} // change
+      />
+      {otherVehicles.map((vehicle) => {
+        const { name, type, props, color, position } = vehicle;
+        console.log(type);
+
+        return (
+          <CreateCar
+            key={name}
+            name={name}
+            children={
+              type === 'car' ? (
+                <Car props={props} color={color} />
+              ) : (
+                <Truck props={props} />
+              )
+            }
+            position={position} // change
+          />
+        );
+      })}
+      {/* <CreateCar
+        name={'Truck'}
+        children={<Truck props={truckProps} />}
+        position={[-200, 0, 0]} // change
+      /> */}
+    </>
   );
 };
 
