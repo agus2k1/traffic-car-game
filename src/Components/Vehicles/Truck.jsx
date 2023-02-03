@@ -1,9 +1,8 @@
 import React from 'react';
 import {
   getTruckFrontTexture,
-  getTruckLeftSideTexture,
-  getTruckRightSideTexture,
-} from '../../assets/CarsTextures';
+  getTruckSideTexture,
+} from '../../assets/VehiclesTextures';
 
 const Truck = ({ props }) => {
   const {
@@ -48,12 +47,9 @@ const Truck = ({ props }) => {
         <meshLambertMaterial attach="material-3" color={cabinColor} />
         <meshLambertMaterial
           attach="material-4"
-          map={getTruckLeftSideTexture()}
+          map={getTruckSideTexture('left')}
         />
-        <meshLambertMaterial
-          attach="material-5"
-          map={getTruckRightSideTexture()}
-        />
+        <meshLambertMaterial attach="material-5" map={getTruckSideTexture()} />
       </mesh>
       {/* Connector */}
       <mesh position={connectorPosition}>
