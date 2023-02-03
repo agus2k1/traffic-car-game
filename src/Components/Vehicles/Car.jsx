@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  getPlayerCarFrontTexture,
-  getPlayerCarSideTexture,
-} from '../../assets/CarsTextures';
+  getCarFrontTexture,
+  getCarSideTexture,
+} from '../../assets/VehiclesTextures';
 
 const PlayerCar = ({ props, color }) => {
   const { backWheelPosition, frontWheelPosition, wheelArgs, wheelColor } =
@@ -30,24 +30,15 @@ const PlayerCar = ({ props, color }) => {
       {/* Cabin */}
       <mesh position={cabinPosition}>
         <boxGeometry attach="geometry" args={cabinArgs} />
-        <meshLambertMaterial
-          attach="material-0"
-          map={getPlayerCarFrontTexture()}
-        />
-        <meshLambertMaterial
-          attach="material-1"
-          map={getPlayerCarFrontTexture()}
-        />
+        <meshLambertMaterial attach="material-0" map={getCarFrontTexture()} />
+        <meshLambertMaterial attach="material-1" map={getCarFrontTexture()} />
         <meshLambertMaterial attach="material-2" color={cabinColor} />
         <meshLambertMaterial attach="material-3" color={cabinColor} />
         <meshLambertMaterial
           attach="material-4"
-          map={getPlayerCarSideTexture()}
+          map={getCarSideTexture('left')}
         />
-        <meshLambertMaterial
-          attach="material-5"
-          map={getPlayerCarSideTexture()}
-        />
+        <meshLambertMaterial attach="material-5" map={getCarSideTexture()} />
       </mesh>
     </>
   );
