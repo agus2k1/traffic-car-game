@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Car from './Vehicles/Car';
 import Truck from './Vehicles/Truck';
-import { carProps, truckProps } from '../assets/CarsData';
+import { carProps, truckProps } from '../assets/VehiclesData';
 import { useGameContext } from '../context/GameContext';
 
 const CreateCar = ({ name, children, position }) => {
@@ -13,7 +13,7 @@ const CreateCar = ({ name, children, position }) => {
 };
 
 const Cars = () => {
-  const { resetGame } = useGameContext();
+  const { resetGame, accelerate, decelerate } = useGameContext();
   const [playerAngleMoved, setPlayerAngleMoved] = useState(0);
   const [otherVehicles, setOtherVehicles] = useState([
     {
@@ -25,11 +25,27 @@ const Cars = () => {
     },
   ]);
 
+  let lastTimestamp;
+
   useEffect(() => {
     setPlayerAngleMoved(0);
     // setOtherVehicles([]);
     let lastTimestamp = undefined;
   }, []);
+
+  const vehicleAnimation = (timestamp) => {
+    if (!lastTimestamp) {
+      lastTimestamp = timestamp;
+      return;
+    }
+    const deltaTime = timestamp - lastTimestamp;
+
+    lastTimestamp = timestamp;
+  };
+
+  const onAccelerate = () => {};
+
+  const onDecelerate = () => {};
 
   return (
     <>
@@ -37,10 +53,11 @@ const Cars = () => {
         name={'playerCar'}
         children={<Car props={carProps} color={0xa52523} />}
         position={[150, 0, 220]} // change
+        accelerate={onAccelerate}
+        decelerate={onDecelerate}
       />
       {otherVehicles.map((vehicle) => {
         const { name, type, props, color, position } = vehicle;
-        console.log(type);
 
         return (
           <CreateCar
