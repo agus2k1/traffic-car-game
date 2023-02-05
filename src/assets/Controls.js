@@ -1,12 +1,14 @@
-let accelerate = false;
-let decelerate = false;
+export let accelerate = false;
+export let decelerate = false;
+let lastTimestamp;
 
-const controls = () => {
+export const controls = () => {
   // Key down
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp' || e.key === 'w') {
       if (!accelerate) {
         accelerate = true;
+        console.log(accelerate);
         return;
       }
     }
@@ -27,6 +29,7 @@ const controls = () => {
     if (e.key === 'ArrowUp' || e.key === 'w') {
       if (accelerate) {
         accelerate = false;
+        console.log(accelerate);
         return;
       }
     }
