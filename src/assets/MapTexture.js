@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 // Track
-const trackRadius = 225; // Distance to the center of the track
+export const trackRadius = 225; // Distance to the center of the track
 const trackWidth = 45;
 const innerTrackRadius = trackRadius - trackWidth;
 const outerTrackRadius = trackRadius + trackWidth;
@@ -10,7 +10,7 @@ const arcAngle1 = (60 / 180) * Math.PI; // Degrees to radians (60 deg)
 const deltaY = Math.sin(arcAngle1) * innerTrackRadius; // Sin(angle) * hypotenuse = opposite side length
 const arcAngle2 = Math.asin(deltaY / outerTrackRadius); // sin(angle) = opposite / hypotenuse => arcsine(sin(angle)) = angle
 
-const arcCenterX =
+export const arcCenterX =
   (Math.cos(arcAngle1) * innerTrackRadius +
     Math.cos(arcAngle2) * outerTrackRadius) /
   2;
