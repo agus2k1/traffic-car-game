@@ -4,7 +4,7 @@ import {
   getTruckSideTexture,
 } from '../../assets/VehiclesTextures';
 
-const Truck = ({ props }) => {
+const Truck = ({ props, color }) => {
   const {
     backWheelPosition,
     middleWheelPosition,
