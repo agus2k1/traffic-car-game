@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { carProps } from '../assets/VehiclesData';
+import { carProps, truckProps } from '../assets/VehiclesData';
 import { controls } from '../assets/Controls';
 
 const GameContext = React.createContext(null);
@@ -11,11 +11,14 @@ export const useGameContext = () => {
 
 const vehiclesInitialState = [
   {
-    name: 'greenCar',
+    name: 'car-1',
     type: 'car',
     props: carProps,
-    color: 0x1f9c32,
-    position: [-160, 0, 220],
+  },
+  {
+    name: 'truck-1',
+    type: 'truck',
+    props: truckProps,
   },
 ];
 export const GameProvider = ({ children }) => {
