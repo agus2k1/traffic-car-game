@@ -8,7 +8,6 @@ export const controls = () => {
     if (e.key === 'ArrowUp' || e.key === 'w') {
       if (!accelerate) {
         accelerate = true;
-        console.log(accelerate);
         return;
       }
     }
@@ -29,7 +28,6 @@ export const controls = () => {
     if (e.key === 'ArrowUp' || e.key === 'w') {
       if (accelerate) {
         accelerate = false;
-        console.log(accelerate);
         return;
       }
     }
