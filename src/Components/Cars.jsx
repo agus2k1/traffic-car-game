@@ -1,69 +1,73 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import Car from './Vehicles/Car';
 import Truck from './Vehicles/Truck';
-import { carProps, truckProps } from '../assets/VehiclesData';
+import { carProps } from '../assets/VehiclesData';
 import { useGameContext } from '../context/GameContext';
-import AnimateVehicle from '../assets/AnimateVehicle';
+import AnimateVehicles from '../assets/AnimateVehicles';
+import { Center } from '@react-three/drei';
 
-const CreateCar = ({ name, children }) => {
-  let playerCarRef = useRef();
-  let greenCarRef = useRef();
-  let truckRef = useRef();
-
-  const getRef = () => {
-    if (name === 'playerCar') {
-      return playerCarRef;
-    } else if (name === 'greenCar') {
-      return greenCarRef;
-    } else if (name === 'truck') {
-      return truckRef;
+const CreateCar = ({ reference, name, children }) => {
+  useFrame((state, delta) => {
+    if (reference) {
+      AnimateVehicles(reference, delta);
     }
-  };
-
-  useFrame((state, delta, frame) => {
-    AnimateVehicle(getRef(), delta);
   });
 
   return (
-    <group ref={getRef()} name={name}>
+    <Center ref={reference} name={name} disableY>
       {children}
-    </group>
+    </Center>
   );
 };
 
 const Cars = () => {
   const { otherVehicles, setPlayerAngleMoved } = useGameContext();
 
+  let playerRef = useRef();
+
   return (
     <>
       <CreateCar
-        name={'playerCar'}
+        reference={playerRef}
+        name={'player'}
         children={<Car props={carProps} color={0xa52523} />}
       />
-      {otherVehicles.map((vehicle) => {
-        const { name, type, props, color, position } = vehicle;
+      {otherVehicles.map((vehicle, i) => {
+        const { name, type, props } = vehicle;
+
+        const createRef = () => {
+          return (window['vehicleRef' + (i + 1)] = useRef());
+        };
+
+        const getColor = () => {
+          const colors = [
+            'blue',
+            'yellow',
+            0x1f9c32,
+            'orange',
+            'black',
+            'white',
+          ];
+          return colors[Math.floor(Math.random() * colors.length)];
+        };
 
         return (
           <CreateCar
             key={name}
+            reference={createRef()}
             name={name}
+            type={type}
             children={
               type === 'car' ? (
-                <Car props={props} color={color} />
+                <Car props={props} color={getColor()} />
               ) : (
-                <Truck props={props} />
+                <Truck props={props} color={getColor()} />
               )
             }
-            position={position} // change
           />
         );
       })}
-      {/* <CreateCar
-        name={'Truck'}
-        children={<Truck props={truckProps} />}
-        position={[-200, 0, 0]} // change
-      /> */}
     </>
   );
 };
