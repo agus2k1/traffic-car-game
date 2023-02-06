@@ -1,122 +1,140 @@
 import { accelerate, decelerate } from '../assets/Controls';
 import { trackRadius, arcCenterX } from '../assets/MapTexture';
 
-let playerAngleInitial = Math.PI / 3;
 let playerAngleMoved = 0;
-const playerSpeed = 0.7;
+const playerSpeed = 0.3;
 
-let AICarAngleInitial = Math.PI / 2;
-let AICarAngleMoved = 0;
-const AISpeed = 0.8;
+let carAngleMoved = 0;
+const AISpeed = 0.2;
 
-let AITruckAngleInitial = -Math.PI / 2;
-let AITruckAngleMoved = 0;
-
-let score = 0;
+let truckAngleMoved = 0;
 
 let playerHitZoneFront;
 let playerHitZoneBack;
 
-const AnimateVehicles = (ref, delta) => {
-  const getPlayerSpeed = () => {
-    if (accelerate) return playerSpeed * 2;
-    if (decelerate) return playerSpeed * 0.5;
-    return playerSpeed;
-  };
+let carHitZoneFront;
+let carHitZoneBack;
 
-  const speed = getPlayerSpeed();
+let truckHitZoneFront;
+let truckHitZoneMiddle;
+let truckHitZoneBack;
 
-  if (ref.current.name === 'player') {
-    playerAngleMoved += speed * delta;
-    const totalPlayerAngle = playerAngleInitial + playerAngleMoved;
+export let score = 0;
 
-    const playerX = Math.cos(totalPlayerAngle) * trackRadius + arcCenterX;
-    const playerY = Math.sin(totalPlayerAngle) * trackRadius;
+const AnimateVehicles = (state, delta) => {
+  if (!checkCollision()) {
+    const getPlayerSpeed = () => {
+      if (accelerate) return playerSpeed * 2;
+      if (decelerate) return playerSpeed * 0.5;
+      return playerSpeed;
+    };
 
-    ref.current.position.x = playerX;
-    ref.current.position.z = playerY;
-    ref.current.rotation.y = -totalPlayerAngle - Math.PI / 2;
+    const speed = getPlayerSpeed();
 
-    playerHitZoneFront = getHitZonePosition(
-      ref.current.position,
-      totalPlayerAngle,
-      15
+    const vehicles = state.scene.children.filter(
+      (object) => object.type === 'Group'
     );
+    const player = vehicles.filter((vehicle) => vehicle.name === 'player');
+    const cars = vehicles.filter((vehicle) => vehicle.name.includes('car'));
+    const trucks = vehicles.filter((vehicle) => vehicle.name.includes('truck'));
 
-    playerHitZoneBack = getHitZonePosition(
-      ref.current.position,
-      totalPlayerAngle,
-      -15
-    );
-  }
+    setVehicle(player[0], player[0].name, speed, delta, Math.PI * 2);
+    cars.map((car, i) => {
+      setVehicle(car, car.name, AISpeed, delta, Math.PI / (2 * (i + 1)));
+    });
+    trucks.map((truck, i) => {
+      setVehicle(truck, truck.name, AISpeed, delta, Math.PI / (2 * (i + 1)));
+    });
 
-  if (ref.current.name.includes('car')) {
-    AICarAngleMoved -= AISpeed * delta;
-    const totalAIAngle = AICarAngleInitial - AICarAngleMoved;
+    // Laps counter
+    const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
 
-    const AIX = Math.cos(totalAIAngle) * trackRadius - arcCenterX;
-    const AIY = Math.sin(totalAIAngle) * trackRadius;
-
-    ref.current.position.x = AIX;
-    ref.current.position.z = AIY;
-    ref.current.rotation.y = -totalAIAngle - Math.PI / 2;
-
-    const carHitZoneFront = getHitZonePosition(
-      ref.current.position,
-      totalAIAngle,
-      15
-    );
-
-    const carHitZoneBack = getHitZonePosition(
-      ref.current.position,
-      totalAIAngle,
-      -15
-    );
-
-    // Player hit the vehicle
-    if (getDistance(playerHitZoneFront, carHitZoneFront) < 10)
-      console.log('collision');
-    if (getDistance(playerHitZoneFront, carHitZoneBack) < 10)
-      console.log('collision');
-
-    // Vehicle hit the player
-    if (getDistance(playerHitZoneBack, carHitZoneFront) < 10)
-      console.log('collision');
-  }
-
-  if (ref.current.name.includes('truck')) {
-    AITruckAngleMoved -= AISpeed * delta;
-    const totalAIAngle = AITruckAngleInitial - AITruckAngleMoved;
-
-    const AIX = Math.cos(totalAIAngle) * trackRadius - arcCenterX;
-    const AIY = Math.sin(totalAIAngle) * trackRadius;
-
-    ref.current.position.x = AIX;
-    ref.current.position.z = AIY;
-    ref.current.rotation.y = -totalAIAngle - Math.PI / 2;
-  }
-
-  // Laps counter
-  const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
-
-  if (laps !== score) {
-    score = laps;
+    if (laps !== score) {
+      score = laps;
+      console.log(state);
+      if (score === 1) {
+      }
+    }
   }
 };
 
 export default AnimateVehicles;
+
+const setVehicle = (object, name, speed, delta, angleInitial) => {
+  name === 'player'
+    ? (playerAngleMoved += speed * delta)
+    : name.includes('car')
+    ? (carAngleMoved -= speed * delta)
+    : (truckAngleMoved -= speed * delta);
+  const totalAngle =
+    name === 'player'
+      ? angleInitial + playerAngleMoved
+      : name.includes('car')
+      ? angleInitial - carAngleMoved
+      : angleInitial - truckAngleMoved;
+
+  const x =
+    name === 'player'
+      ? Math.cos(totalAngle) * trackRadius + arcCenterX
+      : Math.cos(totalAngle) * trackRadius - arcCenterX;
+  const z = Math.sin(totalAngle) * trackRadius;
+
+  object.position.x = x;
+  object.position.z = z;
+  object.rotation.y = -totalAngle - Math.PI / 2;
+
+  name === 'player'
+    ? (playerHitZoneFront = getHitZonePosition(object.position, totalAngle, 15))
+    : name.includes('car')
+    ? (carHitZoneFront = getHitZonePosition(object.position, totalAngle, 15))
+    : (truckHitZoneFront = getHitZonePosition(object.position, totalAngle, 15));
+
+  name === 'player'
+    ? (playerHitZoneBack = getHitZonePosition(object.position, totalAngle, -15))
+    : name.includes('car')
+    ? (carHitZoneBack = getHitZonePosition(object.position, totalAngle, -15))
+    : (truckHitZoneBack = getHitZonePosition(object.position, totalAngle, -15));
+
+  name.includes('truck')
+    ? (truckHitZoneMiddle = getHitZonePosition(object.position, totalAngle, 1))
+    : null;
+};
 
 const getHitZonePosition = (center, angle, distance) => {
   const directionAngle = angle + -Math.PI / 2;
 
   return {
     x: center.x + Math.cos(directionAngle) * distance,
-    y: center.y + Math.sin(directionAngle) * distance,
+    z: center.z + Math.sin(directionAngle) * distance,
   };
 };
 
 const getDistance = (position1, position2) => {
   return Math.sqrt(
-    (position2.x - position1.x) ** 2 + (position2.y - position1.y) ** 2
+    (position2.x - position1.x) ** 2 + (position2.z - position1.z) ** 2
   );
+};
+
+const checkCollision = () => {
+  if (
+    playerHitZoneFront &&
+    playerHitZoneBack &&
+    carHitZoneFront &&
+    carHitZoneBack &&
+    truckHitZoneFront &&
+    truckHitZoneBack &&
+    truckHitZoneMiddle
+  ) {
+    // Player hit a car
+    if (getDistance(playerHitZoneFront, carHitZoneFront) < 40) return true;
+    if (getDistance(playerHitZoneFront, carHitZoneBack) < 40) return true;
+    // Car hit the player
+    if (getDistance(playerHitZoneBack, carHitZoneFront) < 40) return true;
+    // Player hit a truck
+    if (getDistance(playerHitZoneFront, truckHitZoneFront) < 40) return true;
+    if (getDistance(playerHitZoneFront, truckHitZoneMiddle) < 40) return true;
+    if (getDistance(playerHitZoneFront, truckHitZoneBack) < 40) return true;
+    // Truck hit the player
+    if (getDistance(playerHitZoneBack, truckHitZoneFront) < 40) return true;
+  }
 };
