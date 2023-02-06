@@ -1,44 +1,28 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useFrame } from '@react-three/fiber';
 import Car from './Vehicles/Car';
 import Truck from './Vehicles/Truck';
 import { carProps } from '../assets/VehiclesData';
-import { useGameContext } from '../context/GameContext';
 import AnimateVehicles from '../assets/AnimateVehicles';
-import { Center } from '@react-three/drei';
+import { vehiclesLv1, vehiclesLv2 } from '../assets/Levels';
 
-const CreateCar = ({ reference, name, children }) => {
+const CreateCar = ({ name, children }) => {
   useFrame((state, delta) => {
-    if (reference) {
-      AnimateVehicles(reference, delta);
-    }
+    AnimateVehicles(state, delta);
   });
 
-  return (
-    <Center ref={reference} name={name} disableY>
-      {children}
-    </Center>
-  );
+  return <group name={name}>{children}</group>;
 };
 
 const Cars = () => {
-  const { otherVehicles, setPlayerAngleMoved } = useGameContext();
-
-  let playerRef = useRef();
-
   return (
     <>
       <CreateCar
-        reference={playerRef}
         name={'player'}
         children={<Car props={carProps} color={0xa52523} />}
       />
-      {otherVehicles.map((vehicle, i) => {
+      {vehiclesLv2.map((vehicle) => {
         const { name, type, props } = vehicle;
-
-        const createRef = () => {
-          return (window['vehicleRef' + (i + 1)] = useRef());
-        };
 
         const getColor = () => {
           const colors = [
@@ -55,9 +39,7 @@ const Cars = () => {
         return (
           <CreateCar
             key={name}
-            reference={createRef()}
             name={name}
-            type={type}
             children={
               type === 'car' ? (
                 <Car props={props} color={getColor()} />
