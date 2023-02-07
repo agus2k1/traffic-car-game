@@ -12,6 +12,8 @@ let truckAngleMoved = 0;
 let playerHitZoneFront;
 let playerHitZoneBack;
 
+let hitZonesArray = [];
+
 let carHitZoneFront;
 let carHitZoneBack;
 
@@ -55,6 +57,7 @@ const AnimateVehicles = (state, delta) => {
       if (score === 1) {
       }
     }
+    hitZonesArray = [];
   }
 };
 
@@ -86,17 +89,17 @@ const setVehicle = (object, name, speed, delta, angleInitial) => {
   name === 'player'
     ? (playerHitZoneFront = getHitZonePosition(object.position, totalAngle, 15))
     : name.includes('car')
-    ? (carHitZoneFront = getHitZonePosition(object.position, totalAngle, 15))
-    : (truckHitZoneFront = getHitZonePosition(object.position, totalAngle, 15));
+    ? hitZonesArray.push(getHitZonePosition(object.position, totalAngle, 15))
+    : hitZonesArray.push(getHitZonePosition(object.position, totalAngle, 15));
 
   name === 'player'
     ? (playerHitZoneBack = getHitZonePosition(object.position, totalAngle, -15))
     : name.includes('car')
-    ? (carHitZoneBack = getHitZonePosition(object.position, totalAngle, -15))
-    : (truckHitZoneBack = getHitZonePosition(object.position, totalAngle, -15));
+    ? hitZonesArray.push(getHitZonePosition(object.position, totalAngle, -15))
+    : hitZonesArray.push(getHitZonePosition(object.position, totalAngle, -15));
 
   name.includes('truck')
-    ? (truckHitZoneMiddle = getHitZonePosition(object.position, totalAngle, 1))
+    ? hitZonesArray.push(getHitZonePosition(object.position, totalAngle, 1))
     : null;
 };
 
@@ -126,6 +129,7 @@ const checkCollision = () => {
     truckHitZoneMiddle
   ) {
     // Player hit a car
+    hitZonesArray.forEach((hitzone) => {});
     if (getDistance(playerHitZoneFront, carHitZoneFront) < 40) return true;
     if (getDistance(playerHitZoneFront, carHitZoneBack) < 40) return true;
     // Car hit the player
