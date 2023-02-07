@@ -129,8 +129,9 @@ const checkCollision = () => {
     truckHitZoneMiddle
   ) {
     // Player hit a car
-    hitZonesArray.forEach((hitzone) => {});
-    if (getDistance(playerHitZoneFront, carHitZoneFront) < 40) return true;
+    hitZonesArray.forEach((hitzone) => {
+      if (getDistance(playerHitZoneFront, hitzone) < 40) return true;
+    });
     if (getDistance(playerHitZoneFront, carHitZoneBack) < 40) return true;
     // Car hit the player
     if (getDistance(playerHitZoneBack, carHitZoneFront) < 40) return true;
