@@ -15,17 +15,17 @@ export const vehiclesLv1 = [
 
 export const vehiclesLv2 = [
   {
-    name: 'car-1',
-    type: 'car',
-    props: carProps,
-  },
-  {
     name: 'car-2',
     type: 'car',
     props: carProps,
   },
   {
-    name: 'truck-1',
+    name: 'car-3',
+    type: 'car',
+    props: carProps,
+  },
+  {
+    name: 'truck-2',
     type: 'truck',
     props: truckProps,
   },
