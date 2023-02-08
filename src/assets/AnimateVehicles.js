@@ -1,27 +1,22 @@
 import { accelerate, decelerate } from '../assets/Controls';
 import { trackRadius, arcCenterX } from '../assets/MapTexture';
+import { vehiclesLv1, vehiclesLv2 } from './Levels';
 
 let playerAngleMoved = 0;
 const playerSpeed = 0.3;
 
 let carAngleMoved = 0;
-const AISpeed = 0.2;
-
 let truckAngleMoved = 0;
+const CarSpeed = 0.2;
+const truckSpeed = 0.3;
 
 let playerHitZoneFront;
 let playerHitZoneBack;
 
 let hitZonesArray = [];
 
-let carHitZoneFront;
-let carHitZoneBack;
-
-let truckHitZoneFront;
-let truckHitZoneMiddle;
-let truckHitZoneBack;
-
-export let score = 0;
+let score = 0;
+let level = 1;
 
 const AnimateVehicles = (state, delta) => {
   if (!checkCollision()) {
@@ -32,6 +27,7 @@ const AnimateVehicles = (state, delta) => {
     };
 
     const speed = getPlayerSpeed();
+    hitZonesArray = [];
 
     const vehicles = state.scene.children.filter(
       (object) => object.type === 'Group'
@@ -42,10 +38,16 @@ const AnimateVehicles = (state, delta) => {
 
     setVehicle(player[0], player[0].name, speed, delta, Math.PI * 2);
     cars.map((car, i) => {
-      setVehicle(car, car.name, AISpeed, delta, Math.PI / (2 * (i + 1)));
+      setVehicle(car, car.name, CarSpeed, delta, Math.PI / (2 * (i + 1)));
     });
     trucks.map((truck, i) => {
-      setVehicle(truck, truck.name, AISpeed, delta, Math.PI / (2 * (i + 1)));
+      setVehicle(
+        truck,
+        truck.name,
+        truckSpeed,
+        delta,
+        -Math.PI / (2 * (i + 1))
+      );
     });
 
     // Laps counter
@@ -53,11 +55,11 @@ const AnimateVehicles = (state, delta) => {
 
     if (laps !== score) {
       score = laps;
-      console.log(state);
-      if (score === 1) {
+      console.log(score);
+      if (score === 3) {
+        level++;
       }
     }
-    hitZonesArray = [];
   }
 };
 
@@ -119,27 +121,11 @@ const getDistance = (position1, position2) => {
 };
 
 const checkCollision = () => {
-  if (
-    playerHitZoneFront &&
-    playerHitZoneBack &&
-    carHitZoneFront &&
-    carHitZoneBack &&
-    truckHitZoneFront &&
-    truckHitZoneBack &&
-    truckHitZoneMiddle
-  ) {
-    // Player hit a car
-    hitZonesArray.forEach((hitzone) => {
-      if (getDistance(playerHitZoneFront, hitzone) < 40) return true;
-    });
-    if (getDistance(playerHitZoneFront, carHitZoneBack) < 40) return true;
-    // Car hit the player
-    if (getDistance(playerHitZoneBack, carHitZoneFront) < 40) return true;
-    // Player hit a truck
-    if (getDistance(playerHitZoneFront, truckHitZoneFront) < 40) return true;
-    if (getDistance(playerHitZoneFront, truckHitZoneMiddle) < 40) return true;
-    if (getDistance(playerHitZoneFront, truckHitZoneBack) < 40) return true;
-    // Truck hit the player
-    if (getDistance(playerHitZoneBack, truckHitZoneFront) < 40) return true;
+  if (playerHitZoneFront && playerHitZoneBack) {
+    return hitZonesArray.some(
+      (hitzone) =>
+        getDistance(playerHitZoneFront, hitzone) < 40 ||
+        getDistance(playerHitZoneBack, hitzone) < 40
+    );
   }
 };
