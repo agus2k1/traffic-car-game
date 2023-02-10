@@ -1,4 +1,4 @@
-import { accelerate, decelerate } from '../assets/Controls';
+import { accelerate, decelerate, start } from '../assets/Controls';
 import { trackRadius, arcCenterX } from '../assets/MapTexture';
 import { vehiclesLv1, vehiclesLv2 } from './Levels';
 
@@ -19,7 +19,7 @@ let score = 0;
 let level = 1;
 
 const AnimateVehicles = (state, delta) => {
-  if (!checkCollision()) {
+  if (!checkCollision() && start) {
     const getPlayerSpeed = () => {
       if (accelerate) return playerSpeed * 2;
       if (decelerate) return playerSpeed * 0.5;
@@ -80,9 +80,14 @@ const setVehicle = (object, name, speed, delta, angleInitial) => {
 
   const x =
     name === 'player'
-      ? Math.cos(totalAngle) * trackRadius + arcCenterX
-      : Math.cos(totalAngle) * trackRadius - arcCenterX;
-  const z = Math.sin(totalAngle) * trackRadius;
+      ? Math.cos(totalAngle) * (trackRadius + 30) + arcCenterX
+      : name.includes('car')
+      ? Math.cos(totalAngle) * (trackRadius + 30) - arcCenterX
+      : Math.cos(totalAngle) * (trackRadius - 30) - arcCenterX;
+  const z =
+    name === 'player' || name.includes('car')
+      ? Math.sin(totalAngle) * (trackRadius + 30)
+      : Math.sin(totalAngle) * (trackRadius - 30);
 
   object.position.x = x;
   object.position.z = z;
