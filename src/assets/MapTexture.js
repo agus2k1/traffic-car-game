@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
 // Track
-export const trackRadius = 225; // Distance to the center of the track
-const trackWidth = 45;
+export const trackRadius = 250; // Distance to the center of the track
+const trackWidth = 60;
 const innerTrackRadius = trackRadius - trackWidth;
 const outerTrackRadius = trackRadius + trackWidth;
 
@@ -30,12 +30,12 @@ export const getLineMarkings = (mapWidth, mapHeight) => {
 
   ctx.lineWidth = 2;
   ctx.strokeStyle = '#E0FFFF';
-  ctx.setLineDash([10, 14]); // After 10 units stroke there will be 14 units gap
+  ctx.setLineDash([10, 5]); // After 10 units stroke there will be 14 units gap
 
   // Left circle
   ctx.beginPath();
   ctx.arc(
-    mapWidth / 2 - arcCenterX,
+    mapWidth / 2 + arcCenterX,
     mapHeight / 2,
     trackRadius,
     0,
@@ -46,7 +46,7 @@ export const getLineMarkings = (mapWidth, mapHeight) => {
   // Right circle
   ctx.beginPath();
   ctx.arc(
-    mapWidth / 2 + arcCenterX,
+    mapWidth / 2 - arcCenterX,
     mapHeight / 2,
     trackRadius,
     0,
