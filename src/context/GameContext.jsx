@@ -8,25 +8,15 @@ export const useGameContext = () => {
 };
 
 export const GameProvider = ({ children }) => {
-  const [ready, setReady] = useState(true);
-
-  const reset = () => {
-    setOtherVehicles(vehiclesInitialState);
-  };
-
-  const startGame = () => {
-    if (ready) {
-      setReady(false);
-    }
-  };
+  const [start, setStart] = useState(false);
 
   controls();
 
   return (
     <GameContext.Provider
       value={{
-        ready,
-        setReady,
+        start,
+        setStart,
       }}
     >
       {children}
