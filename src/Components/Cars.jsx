@@ -5,8 +5,11 @@ import Truck from './Vehicles/Truck';
 import { carProps } from '../assets/VehiclesData';
 import AnimateVehicles from '../assets/AnimateVehicles';
 import { vehiclesLv1, vehiclesLv2 } from '../assets/Levels';
+import { useGameContext } from '../context/GameContext';
 
 const CreateCar = ({ name, children }) => {
+  const { start } = useGameContext();
+
   useFrame((state, delta) => {
     AnimateVehicles(state, delta);
   });
