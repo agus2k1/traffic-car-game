@@ -1,23 +1,14 @@
 import React from 'react';
-import { useFrame } from '@react-three/fiber';
 import Car from './Vehicles/Car';
 import Truck from './Vehicles/Truck';
 import { carProps } from '../assets/VehiclesData';
-import AnimateVehicles from '../assets/AnimateVehicles';
+import CreateCar from './CreateCar';
 import { vehiclesLv1, vehiclesLv2 } from '../assets/Levels';
 import { useGameContext } from '../context/GameContext';
 
-const CreateCar = ({ name, children }) => {
-  const { start } = useGameContext();
-
-  useFrame((state, delta) => {
-    AnimateVehicles(state, delta);
-  });
-
-  return <group name={name}>{children}</group>;
-};
-
 const Cars = () => {
+  const { getColor } = useGameContext();
+
   return (
     <>
       <CreateCar
@@ -26,18 +17,6 @@ const Cars = () => {
       />
       {vehiclesLv2.map((vehicle) => {
         const { name, type, props } = vehicle;
-
-        const getColor = () => {
-          const colors = [
-            'blue',
-            'yellow',
-            0x1f9c32,
-            'orange',
-            'black',
-            'white',
-          ];
-          return colors[Math.floor(Math.random() * colors.length)];
-        };
 
         return (
           <CreateCar
