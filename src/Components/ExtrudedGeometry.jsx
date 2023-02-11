@@ -2,7 +2,7 @@ import React from 'react';
 
 const ExtrudedGeometry = ({ shape }) => {
   return (
-    <mesh rotation={[-1.57, 0, 0]} onPointerEnter={() => console.log('click')}>
+    <mesh rotation={[-1.57, 0, 0]}>
       <extrudeGeometry
         attach="geometry"
         args={[shape, { depth: 8, bevelEnabled: false }]}
