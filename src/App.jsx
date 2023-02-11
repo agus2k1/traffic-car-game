@@ -7,17 +7,20 @@ import Map from './Components/Map';
 import { useGameContext } from './context/GameContext';
 
 function App() {
+  const { showCollisionMessage } = useGameContext();
   const aspectRatio = window.innerWidth / window.innerHeight;
   const cameraWidth = 2000;
   const cameraHeight = cameraWidth / aspectRatio;
 
   return (
     <>
-      {/* <div className="message-wrapper">
-        <p className="message-title">You crashed!</p>
-        <p className="message-desc">Press R to restart</p>
-      </div> */}
-      <div className="game">
+      {showCollisionMessage && (
+        <div className="message-wrapper">
+          <p className="message-title">You crashed!</p>
+          <p className="message-desc">Press R to restart</p>
+        </div>
+      )}
+      <div className={`game ${showCollisionMessage ? 'lost' : ''}`}>
         <Canvas
           orthographic
           camera={{
