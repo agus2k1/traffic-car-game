@@ -4,14 +4,14 @@ import {
   getCarSideTexture,
 } from '../../assets/VehiclesTextures';
 
-const PlayerCar = ({ props, color }) => {
+const Car = ({ reference, name, props, color }) => {
   const { backWheelPosition, frontWheelPosition, wheelArgs, wheelColor } =
     props.wheels;
   const { mainPosition, mainArgs } = props.main;
   const { cabinPosition, cabinArgs, cabinColor } = props.cabin;
 
   return (
-    <>
+    <group ref={reference} name={name}>
       {/* Back Wheel */}
       <mesh position={backWheelPosition}>
         <boxGeometry attach="geometry" args={wheelArgs} />
@@ -40,8 +40,8 @@ const PlayerCar = ({ props, color }) => {
         />
         <meshLambertMaterial attach="material-5" map={getCarSideTexture()} />
       </mesh>
-    </>
+    </group>
   );
 };
 
-export default PlayerCar;
+export default Car;
