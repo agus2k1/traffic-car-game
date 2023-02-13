@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { trackRadius, arcCenterX } from '../assets/MapTexture';
 
 const GameContext = React.createContext(null);
@@ -7,20 +7,56 @@ export const useGameContext = () => {
   return useContext(GameContext);
 };
 
+let carNumber = 0;
+let truckNumber = 0;
+
+const getColor = () => {
+  const colors = ['blue', 'yellow', 'orange', 'black', 'white'];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
+const getRandomVehicle = () => {
+  const randomNumber = Math.round(Math.random());
+  const type = randomNumber >= 0.5 ? 'car' : 'truck';
+  const color = getColor();
+  type === 'car' ? carNumber++ : truckNumber++;
+  const name = type === 'car' ? `car-${carNumber}` : `truck-${truckNumber}`;
+
+  window['car-' + carNumber] = useRef();
+  window['truck-' + truckNumber] = useRef();
+
+  const getRef = () => {
+    return type === 'car'
+      ? window['car-' + carNumber]
+      : window['truck-' + truckNumber];
+  };
+
+  return {
+    reference: getRef(),
+    name,
+    type,
+    color,
+  };
+};
+
 export const GameProvider = ({ children }) => {
   const [runGame, setRunGame] = useState(false);
+  const [newVehicles, setNewVehicles] = useState([
+    getRandomVehicle(),
+    getRandomVehicle(),
+  ]);
   const [showCollisionMessage, setShowCollisionMessage] = useState(false);
 
   let accelerate = false;
   let decelerate = false;
 
   let playerAngleMoved = 0;
-  const playerSpeed = 0.3;
+  const playerSpeed = 1;
 
   let carAngleMoved = 0;
   let truckAngleMoved = 0;
-  const CarSpeed = 0.2;
-  const truckSpeed = 0.3;
+  const carSpeed = 1.1;
+  const truckSpeed = 0.9;
 
   let playerHitZoneFront;
   let playerHitZoneBack;
@@ -33,7 +69,9 @@ export const GameProvider = ({ children }) => {
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowUp' || e.key === 'w') {
         if (!accelerate) {
-          setRunGame(true);
+          if (!runGame) {
+            setRunGame(true);
+          }
           accelerate = true;
           return;
         }
@@ -45,7 +83,10 @@ export const GameProvider = ({ children }) => {
         }
       }
       if (e.key === 'R' || e.key === 'r') {
-        setShowCollisionMessage(false);
+        if (!runGame && showCollisionMessage) {
+          setShowCollisionMessage(false);
+          setNewVehicles([getRandomVehicle()]);
+        }
         return;
       }
     });
@@ -66,6 +107,8 @@ export const GameProvider = ({ children }) => {
       }
     });
   };
+
+  controls();
 
   const initialPositions = (state) => {
     const vehicles = state.scene.children.filter(
@@ -95,11 +138,14 @@ export const GameProvider = ({ children }) => {
     });
   };
 
-  const animateVehicles = (state, delta) => {
+  const animateVehicles = (refs, delta) => {
     if (checkCollision()) {
       setRunGame(false);
       setShowCollisionMessage(true);
-    } else {
+    } else if (refs) {
+      // Laps counter
+      const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
+
       const getPlayerSpeed = () => {
         if (accelerate) return playerSpeed * 2;
         if (decelerate) return playerSpeed * 0.5;
@@ -109,39 +155,18 @@ export const GameProvider = ({ children }) => {
       const speed = getPlayerSpeed();
       hitZonesArray = [];
 
-      const vehicles = state.scene.children.filter(
-        (object) => object.type === 'Group'
-      );
-      const player = vehicles.find((vehicle) => vehicle.name === 'player');
-      const cars = vehicles.filter((vehicle) => vehicle.name.includes('car'));
-      const trucks = vehicles.filter((vehicle) =>
-        vehicle.name.includes('truck')
-      );
-
-      setVehicle(player, player.name, speed, delta, Math.PI * 2);
-      cars.map((car, i) => {
-        setVehicle(car, car.name, CarSpeed, delta, Math.PI / (2 * (i + 1)));
-      });
-      trucks.map((truck, i) => {
-        setVehicle(
-          truck,
-          truck.name,
-          truckSpeed,
-          delta,
-          -Math.PI / (2 * (i + 1))
-        );
-      });
-
-      // Laps counter
-      const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
-
-      if (laps !== score) {
-        score = laps;
-        console.log(score);
-        if (score === 3) {
-          console.log('score: 3');
+      refs.forEach((ref) => {
+        if (ref.current.name === 'player') {
+          const player = ref.current;
+          setVehicle(player, player.name, speed, delta, Math.PI * 2);
+        } else if (ref.current.name.includes('car')) {
+          const car = ref.current;
+          setVehicle(car, car.name, carSpeed, delta, Math.PI / (2 * 1));
+        } else if (ref.current.name.includes('truck')) {
+          const truck = ref.current;
+          setVehicle(truck, truck.name, truckSpeed, delta, -Math.PI / (2 * 1));
         }
-      }
+      });
     }
   };
 
@@ -225,18 +250,12 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  const getColor = () => {
-    const colors = ['blue', 'yellow', 0x1f9c32, 'orange', 'black', 'white'];
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
-
   return (
     <GameContext.Provider
       value={{
         runGame,
+        newVehicles,
         showCollisionMessage,
-        score,
-        controls,
         initialPositions,
         animateVehicles,
         getColor,
