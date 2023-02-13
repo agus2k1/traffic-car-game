@@ -1,34 +1,60 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Car from './Vehicles/Car';
 import Truck from './Vehicles/Truck';
-import { carProps } from '../assets/VehiclesData';
-import CreateCar from './CreateCar';
-import { vehiclesLv1, vehiclesLv2 } from '../assets/Levels';
+import { carProps, truckProps } from '../assets/VehiclesData';
 import { useGameContext } from '../context/GameContext';
+import { useFrame } from '@react-three/fiber';
 
 const Cars = () => {
-  const { getColor } = useGameContext();
+  const {
+    newVehicles,
+    runGame,
+    showCollisionMessage,
+    initialPositions,
+    animateVehicles,
+  } = useGameContext();
+
+  const player = useRef();
+
+  const [references, setReferences] = useState([player]);
+
+  useEffect(() => {
+    newVehicles.map((vehicle) => {
+      setReferences((refs) => [...refs, vehicle.reference]);
+    });
+  }, []);
+
+  useFrame((state, delta) => {
+    if (!runGame && !showCollisionMessage) initialPositions(state);
+    if (runGame && !showCollisionMessage) animateVehicles(references, delta);
+  });
 
   return (
     <>
-      <CreateCar
+      <Car
+        reference={player}
         name={'player'}
-        children={<Car props={carProps} color={0xa52523} />}
+        props={carProps}
+        color={0xa52523}
       />
-      {vehiclesLv2.map((vehicle) => {
-        const { name, type, props } = vehicle;
+      {newVehicles.map((vehicle) => {
+        const { reference, name, type, color } = vehicle;
 
-        return (
-          <CreateCar
+        return type === 'car' ? (
+          <Car
             key={name}
+            reference={reference}
             name={name}
-            children={
-              type === 'car' ? (
-                <Car props={props} color={getColor()} />
-              ) : (
-                <Truck props={props} color={getColor()} />
-              )
-            }
+            props={carProps}
+            color={color}
+          />
+        ) : (
+          <Truck
+            key={name}
+            reference={reference}
+            name={name}
+            props={truckProps}
+            color={color}
           />
         );
       })}
