@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Car from './Vehicles/Car';
 import Truck from './Vehicles/Truck';
 import { carProps, truckProps } from '../assets/VehiclesData';
@@ -7,25 +7,20 @@ import { useFrame } from '@react-three/fiber';
 
 const Cars = () => {
   const {
+    player,
     newVehicles,
     runGame,
     showCollisionMessage,
-    initialPositions,
+    references,
+    getInitialPositions,
     animateVehicles,
   } = useGameContext();
 
-  const player = useRef();
-
-  const [references, setReferences] = useState([player]);
-
   useEffect(() => {
-    newVehicles.map((vehicle) => {
-      setReferences((refs) => [...refs, vehicle.reference]);
-    });
+    getInitialPositions(player, newVehicles);
   }, []);
 
   useFrame((state, delta) => {
-    if (!runGame && !showCollisionMessage) initialPositions(state);
     if (runGame && !showCollisionMessage) animateVehicles(references, delta);
   });
 
@@ -38,12 +33,13 @@ const Cars = () => {
         color={0xa52523}
       />
       {newVehicles.map((vehicle) => {
-        const { reference, name, type, color } = vehicle;
+        const { reference, index, name, type, color } = vehicle;
 
         return type === 'car' ? (
           <Car
             key={name}
             reference={reference}
+            index={index}
             name={name}
             props={carProps}
             color={color}
@@ -52,6 +48,7 @@ const Cars = () => {
           <Truck
             key={name}
             reference={reference}
+            index={index}
             name={name}
             props={truckProps}
             color={color}
