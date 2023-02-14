@@ -9,6 +9,8 @@ export const useGameContext = () => {
 
 let carNumber = 0;
 let truckNumber = 0;
+const carSpaceBetween = 5;
+const truckSpaceBetween = 10;
 
 const getColor = () => {
   const colors = ['blue', 'yellow', 'orange', 'black', 'white'];
@@ -16,8 +18,8 @@ const getColor = () => {
 };
 
 const getRandomVehicle = () => {
-  const randomNumber = Math.round(Math.random());
-  const type = randomNumber >= 0.5 ? 'car' : 'truck';
+  const randomNumber = Math.random();
+  const type = randomNumber >= 0.4 ? 'car' : 'truck';
   const color = getColor();
   type === 'car' ? carNumber++ : truckNumber++;
   const name = type === 'car' ? `car-${carNumber}` : `truck-${truckNumber}`;
@@ -33,6 +35,7 @@ const getRandomVehicle = () => {
 
   return {
     reference: getRef(),
+    index: type === 'car' ? carNumber : truckNumber,
     name,
     type,
     color,
@@ -44,8 +47,14 @@ export const GameProvider = ({ children }) => {
   const [newVehicles, setNewVehicles] = useState([
     getRandomVehicle(),
     getRandomVehicle(),
+    getRandomVehicle(),
+    getRandomVehicle(),
+    getRandomVehicle(),
   ]);
   const [showCollisionMessage, setShowCollisionMessage] = useState(false);
+  const [references, setReferences] = useState([]);
+
+  const player = useRef();
 
   let accelerate = false;
   let decelerate = false;
@@ -55,8 +64,8 @@ export const GameProvider = ({ children }) => {
 
   let carAngleMoved = 0;
   let truckAngleMoved = 0;
-  const carSpeed = 1.1;
-  const truckSpeed = 0.9;
+  const carSpeed = 0.5;
+  const truckSpeed = 0.8;
 
   let playerHitZoneFront;
   let playerHitZoneBack;
@@ -85,7 +94,7 @@ export const GameProvider = ({ children }) => {
       if (e.key === 'R' || e.key === 'r') {
         if (!runGame && showCollisionMessage) {
           setShowCollisionMessage(false);
-          setNewVehicles([getRandomVehicle()]);
+          getInitialPositions(player, newVehicles);
         }
         return;
       }
@@ -110,32 +119,47 @@ export const GameProvider = ({ children }) => {
 
   controls();
 
-  const initialPositions = (state) => {
-    const vehicles = state.scene.children.filter(
-      (object) => object.type === 'Group'
-    );
-    const player = vehicles.find((vehicle) => vehicle.name === 'player');
-    const cars = vehicles.filter((vehicle) => vehicle.name.includes('car'));
-    const trucks = vehicles.filter((vehicle) => vehicle.name.includes('truck'));
-    // player
-    player.position.x = Math.cos(Math.PI * 2) * (trackRadius + 30) + arcCenterX;
-    player.position.z = Math.sin(Math.PI * 2) * (trackRadius + 30);
-    player.rotation.y = -(Math.PI * 2) - Math.PI / 2;
-    // Cars
-    cars.map((car, i) => {
+  const getInitialPositions = (player, otherVehicles) => {
+    setReferences([player]);
+    initialPosition(player);
+    otherVehicles.map((vehicle) => {
+      setReferences((refs) => [...refs, vehicle.reference]);
+      initialPosition(vehicle.reference);
+    });
+  };
+
+  const initialPosition = (ref) => {
+    console.log(ref);
+    if (ref.current.name === 'player') {
+      const player = ref.current;
+      player.position.x =
+        Math.cos(Math.PI * 2) * (trackRadius + 30) + arcCenterX;
+      player.position.z = Math.sin(Math.PI * 2) * (trackRadius + 30);
+      player.rotation.y = -(Math.PI * 2) - Math.PI / 2;
+    } else if (ref.current.name.includes('car')) {
+      const car = ref.current;
+      const i = ref.current.userData.index;
+      console.log(i);
       car.position.x =
-        Math.cos(Math.PI / (2 * (i + 1))) * (trackRadius + 30) - arcCenterX;
-      car.position.z = Math.sin(Math.PI / (2 * (i + 1))) * (trackRadius + 30);
-      car.rotation.y = -(Math.PI / (2 * (i + 1))) - Math.PI / 2;
-    });
-    // Trucks
-    trucks.map((truck, i) => {
+        Math.cos(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30) -
+        arcCenterX;
+      car.position.z =
+        Math.sin(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30);
+      car.rotation.y = -(Math.PI / (2 * i) + i * carSpaceBetween) - Math.PI / 2;
+    } else if (ref.current.name.includes('truck')) {
+      const truck = ref.current;
+      const i = ref.current.userData.index;
+
       truck.position.x =
-        Math.cos(-Math.PI / (2 * (i + 1))) * (trackRadius - 30) - arcCenterX;
+        Math.cos(-Math.PI / (2 * i) + i * truckSpaceBetween) *
+          (trackRadius - 30) -
+        arcCenterX;
       truck.position.z =
-        Math.sin(-Math.PI / (2 * (i + 1))) * (trackRadius - 30);
-      truck.rotation.y = Math.PI / (2 * (i + 1)) - Math.PI / 2;
-    });
+        Math.sin(-Math.PI / (2 * i) + i * truckSpaceBetween) *
+        (trackRadius - 30);
+      truck.rotation.y =
+        -(-Math.PI / (2 * i) + i * truckSpaceBetween) - Math.PI / 2;
+    }
   };
 
   const animateVehicles = (refs, delta) => {
@@ -143,8 +167,14 @@ export const GameProvider = ({ children }) => {
       setRunGame(false);
       setShowCollisionMessage(true);
     } else if (refs) {
+      console.log(refs);
       // Laps counter
       const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
+
+      if (score != laps) {
+        score = laps;
+        console.log(score);
+      }
 
       const getPlayerSpeed = () => {
         if (accelerate) return playerSpeed * 2;
@@ -161,10 +191,24 @@ export const GameProvider = ({ children }) => {
           setVehicle(player, player.name, speed, delta, Math.PI * 2);
         } else if (ref.current.name.includes('car')) {
           const car = ref.current;
-          setVehicle(car, car.name, carSpeed, delta, Math.PI / (2 * 1));
+          const i = ref.current.userData.index;
+          setVehicle(
+            car,
+            car.name,
+            carSpeed,
+            delta,
+            Math.PI / (2 * i) + i * carSpaceBetween
+          );
         } else if (ref.current.name.includes('truck')) {
           const truck = ref.current;
-          setVehicle(truck, truck.name, truckSpeed, delta, -Math.PI / (2 * 1));
+          const i = ref.current.userData.index;
+          setVehicle(
+            truck,
+            truck.name,
+            truckSpeed,
+            delta,
+            -Math.PI / (2 * i) + i * truckSpaceBetween
+          );
         }
       });
     }
@@ -253,10 +297,13 @@ export const GameProvider = ({ children }) => {
   return (
     <GameContext.Provider
       value={{
+        player,
         runGame,
         newVehicles,
         showCollisionMessage,
-        initialPositions,
+        references,
+        initialPosition,
+        getInitialPositions,
         animateVehicles,
         getColor,
       }}
