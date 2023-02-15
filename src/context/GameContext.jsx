@@ -50,6 +50,10 @@ export const GameProvider = ({ children }) => {
     getRandomVehicle(),
     getRandomVehicle(),
     getRandomVehicle(),
+    getRandomVehicle(),
+    getRandomVehicle(),
+    getRandomVehicle(),
+    getRandomVehicle(),
   ]);
   const [showCollisionMessage, setShowCollisionMessage] = useState(false);
   const [references, setReferences] = useState([]);
@@ -71,7 +75,6 @@ export const GameProvider = ({ children }) => {
   let playerHitZoneBack;
 
   let hitZonesArray = [];
-  let score = 0;
 
   const controls = () => {
     // Key down
@@ -94,7 +97,7 @@ export const GameProvider = ({ children }) => {
       if (e.key === 'R' || e.key === 'r') {
         if (!runGame && showCollisionMessage) {
           setShowCollisionMessage(false);
-          getInitialPositions(player, newVehicles);
+          getInitialPositions(player, initialVehicles);
         }
         return;
       }
@@ -129,7 +132,6 @@ export const GameProvider = ({ children }) => {
   };
 
   const initialPosition = (ref) => {
-    console.log(ref);
     if (ref.current.name === 'player') {
       const player = ref.current;
       player.position.x =
@@ -139,7 +141,6 @@ export const GameProvider = ({ children }) => {
     } else if (ref.current.name.includes('car')) {
       const car = ref.current;
       const i = ref.current.userData.index;
-      console.log(i);
       car.position.x =
         Math.cos(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30) -
         arcCenterX;
@@ -167,15 +168,6 @@ export const GameProvider = ({ children }) => {
       setRunGame(false);
       setShowCollisionMessage(true);
     } else if (refs) {
-      console.log(refs);
-      // Laps counter
-      const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
-
-      if (score != laps) {
-        score = laps;
-        console.log(score);
-      }
-
       const getPlayerSpeed = () => {
         if (accelerate) return playerSpeed * 2;
         if (decelerate) return playerSpeed * 0.5;
@@ -188,6 +180,7 @@ export const GameProvider = ({ children }) => {
       refs.forEach((ref) => {
         if (ref.current.name === 'player') {
           const player = ref.current;
+          player.userData.playerScore = getScore();
           setVehicle(player, player.name, speed, delta, Math.PI * 2);
         } else if (ref.current.name.includes('car')) {
           const car = ref.current;
@@ -294,6 +287,12 @@ export const GameProvider = ({ children }) => {
     }
   };
 
+  const getScore = () => {
+    const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
+
+    return laps;
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -302,6 +301,7 @@ export const GameProvider = ({ children }) => {
         newVehicles,
         showCollisionMessage,
         references,
+        getRandomVehicle,
         initialPosition,
         getInitialPositions,
         animateVehicles,
