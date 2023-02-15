@@ -4,14 +4,14 @@ import {
   getCarSideTexture,
 } from '../../assets/VehiclesTextures';
 
-const Car = ({ reference, index, name, props, color }) => {
+const Car = ({ reference, index, name, props, color, playerScore }) => {
   const { backWheelPosition, frontWheelPosition, wheelArgs, wheelColor } =
     props.wheels;
   const { mainPosition, mainArgs } = props.main;
   const { cabinPosition, cabinArgs, cabinColor } = props.cabin;
 
   return (
-    <group ref={reference} name={name} userData={{ index }}>
+    <group ref={reference} name={name} userData={{ index, playerScore }}>
       {/* Back Wheel */}
       <mesh position={backWheelPosition}>
         <boxGeometry attach="geometry" args={wheelArgs} />
