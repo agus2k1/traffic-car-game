@@ -12,29 +12,31 @@ const Cars = () => {
     runGame,
     showCollisionMessage,
     references,
-    getRandomVehicle,
     getInitialPositions,
+    getRefs,
     animateVehicles,
   } = useGameContext();
 
   const [score, setScore] = useState(0);
-  const [initialVehicles, setInitialVehicles] = useState([getRandomVehicle()]);
+  const [vehiclesCounter, setVehiclesCounter] = useState(1);
+  const [interval, setInterval] = useState(0);
 
   useEffect(() => {
-    getInitialPositions(player, initialVehicles);
+    getInitialPositions(player, newVehicles);
+    getRefs(player, newVehicles);
   }, []);
-
-  useEffect(() => {
-    if (score > 2) {
-      // setInitialVehicles((vehicles) => [...vehicles, getRandomVehicle()]);
-    }
-  }, [score]);
 
   useFrame((state, delta) => {
     if (runGame && !showCollisionMessage) {
-      animateVehicles(references, delta);
-      if (score !== player.current.userData.playerScore)
+      animateVehicles(references, delta, vehiclesCounter);
+      if (score !== player.current.userData.playerScore) {
         setScore(player.current.userData.playerScore);
+        setInterval((prevNum) => prevNum + 1);
+        if (interval === 3) {
+          setVehiclesCounter((counter) => counter + 1);
+          setInterval(0);
+        }
+      }
     }
   });
 
@@ -42,38 +44,14 @@ const Cars = () => {
     <>
       <Car
         reference={player}
+        index={0}
         name={'player'}
         props={carProps}
         color={0xa52523}
         playerScore={0}
       />
-      {initialVehicles.map((vehicle) => {
+      {newVehicles.map((vehicle) => {
         const { reference, index, name, type, color } = vehicle;
-
-        return type === 'car' ? (
-          <Car
-            key={name}
-            reference={reference}
-            index={index}
-            name={name}
-            props={carProps}
-            color={color}
-          />
-        ) : (
-          <Truck
-            key={name}
-            reference={reference}
-            index={index}
-            name={name}
-            props={truckProps}
-            color={color}
-          />
-        );
-      })}
-      {newVehicles.map((vehicle, i) => {
-        const { reference, index, name, type, color } = vehicle;
-        if (i > 2) return;
-        // console.log(i);
 
         return type === 'car' ? (
           <Car
