@@ -17,7 +17,7 @@ const getColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-const getRandomVehicle = () => {
+const randomVehicle = () => {
   const randomNumber = Math.random();
   const type = randomNumber >= 0.4 ? 'car' : 'truck';
   const color = getColor();
@@ -42,19 +42,19 @@ const getRandomVehicle = () => {
   };
 };
 
+const getRandomVehicles = (amount) => {
+  const vehiclesArray = [];
+
+  for (let i = 0; i < amount; i++) {
+    vehiclesArray.push(randomVehicle());
+  }
+
+  return vehiclesArray;
+};
+
 export const GameProvider = ({ children }) => {
   const [runGame, setRunGame] = useState(false);
-  const [newVehicles, setNewVehicles] = useState([
-    getRandomVehicle(),
-    getRandomVehicle(),
-    getRandomVehicle(),
-    getRandomVehicle(),
-    getRandomVehicle(),
-    getRandomVehicle(),
-    getRandomVehicle(),
-    getRandomVehicle(),
-    getRandomVehicle(),
-  ]);
+  const [newVehicles, setNewVehicles] = useState(getRandomVehicles(4));
   const [showCollisionMessage, setShowCollisionMessage] = useState(false);
   const [references, setReferences] = useState([]);
 
@@ -97,7 +97,8 @@ export const GameProvider = ({ children }) => {
       if (e.key === 'R' || e.key === 'r') {
         if (!runGame && showCollisionMessage) {
           setShowCollisionMessage(false);
-          getInitialPositions(player, initialVehicles);
+          getInitialPositions(player, newVehicles);
+          setNewVehicles(getRandomVehicles(4));
         }
         return;
       }
@@ -123,11 +124,16 @@ export const GameProvider = ({ children }) => {
   controls();
 
   const getInitialPositions = (player, otherVehicles) => {
-    setReferences([player]);
     initialPosition(player);
     otherVehicles.map((vehicle) => {
-      setReferences((refs) => [...refs, vehicle.reference]);
       initialPosition(vehicle.reference);
+    });
+  };
+
+  const getRefs = (player, otherVehicles) => {
+    setReferences([player]);
+    otherVehicles.map((vehicle) => {
+      setReferences((refs) => [...refs, vehicle.reference]);
     });
   };
 
@@ -163,7 +169,7 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  const animateVehicles = (refs, delta) => {
+  const animateVehicles = (refs, delta, score) => {
     if (checkCollision()) {
       setRunGame(false);
       setShowCollisionMessage(true);
@@ -177,31 +183,35 @@ export const GameProvider = ({ children }) => {
       const speed = getPlayerSpeed();
       hitZonesArray = [];
 
-      refs.forEach((ref) => {
-        if (ref.current.name === 'player') {
-          const player = ref.current;
-          player.userData.playerScore = getScore();
-          setVehicle(player, player.name, speed, delta, Math.PI * 2);
-        } else if (ref.current.name.includes('car')) {
-          const car = ref.current;
-          const i = ref.current.userData.index;
-          setVehicle(
-            car,
-            car.name,
-            carSpeed,
-            delta,
-            Math.PI / (2 * i) + i * carSpaceBetween
-          );
-        } else if (ref.current.name.includes('truck')) {
-          const truck = ref.current;
-          const i = ref.current.userData.index;
-          setVehicle(
-            truck,
-            truck.name,
-            truckSpeed,
-            delta,
-            -Math.PI / (2 * i) + i * truckSpaceBetween
-          );
+      refs.forEach((ref, index) => {
+        if (index <= score) {
+          if (ref.current.name === 'player') {
+            const player = ref.current;
+            player.userData.playerScore = getScore();
+            setVehicle(player, player.name, speed, delta, Math.PI * 2);
+          } else if (ref.current.name.includes('car')) {
+            const car = ref.current;
+            const i = ref.current.userData.index;
+            setVehicle(
+              car,
+              car.name,
+              carSpeed,
+              delta,
+              Math.PI / (2 * i) + i * carSpaceBetween
+            );
+          } else if (ref.current.name.includes('truck')) {
+            const truck = ref.current;
+            const i = ref.current.userData.index;
+            setVehicle(
+              truck,
+              truck.name,
+              truckSpeed,
+              delta,
+              -Math.PI / (2 * i) + i * truckSpaceBetween
+            );
+          }
+        } else {
+          return;
         }
       });
     }
@@ -301,9 +311,10 @@ export const GameProvider = ({ children }) => {
         newVehicles,
         showCollisionMessage,
         references,
-        getRandomVehicle,
+        randomVehicle,
         initialPosition,
         getInitialPositions,
+        getRefs,
         animateVehicles,
         getColor,
       }}
