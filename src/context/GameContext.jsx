@@ -123,10 +123,25 @@ export const GameProvider = ({ children }) => {
 
   controls();
 
-  const getInitialPositions = (player, otherVehicles) => {
+  const getInitialPositions = (player, otherVehicles, score) => {
     initialPosition(player);
-    otherVehicles.map((vehicle) => {
-      initialPosition(vehicle.reference);
+    otherVehicles.map((vehicle, index) => {
+      const ref = vehicle.reference;
+      if (index <= score) {
+        initialPosition(ref);
+      }
+    });
+  };
+
+  const getNextVehicles = (otherVehicles, counter) => {
+    let position = 0;
+    otherVehicles.map((vehicle, index) => {
+      const ref = vehicle.reference;
+      if (index > counter) {
+        ref.current.position.x = -600 - 200 * position;
+        ref.current.position.z = 300;
+        position++;
+      }
     });
   };
 
@@ -156,7 +171,6 @@ export const GameProvider = ({ children }) => {
     } else if (ref.current.name.includes('truck')) {
       const truck = ref.current;
       const i = ref.current.userData.index;
-
       truck.position.x =
         Math.cos(-Math.PI / (2 * i) + i * truckSpaceBetween) *
           (trackRadius - 30) -
@@ -187,7 +201,7 @@ export const GameProvider = ({ children }) => {
         if (index <= score) {
           if (ref.current.name === 'player') {
             const player = ref.current;
-            player.userData.playerScore = getScore();
+            player.userData.playerScore = getScore(playerAngleMoved);
             setVehicle(player, player.name, speed, delta, Math.PI * 2);
           } else if (ref.current.name.includes('car')) {
             const car = ref.current;
@@ -297,7 +311,7 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  const getScore = () => {
+  const getScore = (playerAngleMoved) => {
     const laps = Math.floor(Math.abs(playerAngleMoved) / (Math.PI * 2));
 
     return laps;
@@ -314,6 +328,7 @@ export const GameProvider = ({ children }) => {
         randomVehicle,
         initialPosition,
         getInitialPositions,
+        getNextVehicles,
         getRefs,
         animateVehicles,
         getColor,
