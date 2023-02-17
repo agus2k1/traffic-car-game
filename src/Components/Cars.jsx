@@ -13,28 +13,34 @@ const Cars = () => {
     showCollisionMessage,
     references,
     getInitialPositions,
+    getNextVehicles,
     getRefs,
     animateVehicles,
   } = useGameContext();
 
   const [score, setScore] = useState(0);
   const [vehiclesCounter, setVehiclesCounter] = useState(1);
-  const [interval, setInterval] = useState(0);
+  const [interval, setInterval] = useState(1);
 
   useEffect(() => {
-    getInitialPositions(player, newVehicles);
+    getInitialPositions(player, newVehicles, score);
+    getNextVehicles(newVehicles, score);
     getRefs(player, newVehicles);
   }, []);
 
   useFrame((state, delta) => {
     if (runGame && !showCollisionMessage) {
       animateVehicles(references, delta, vehiclesCounter);
-      if (score !== player.current.userData.playerScore) {
+      if (player.current.userData.playerScore !== score) {
         setScore(player.current.userData.playerScore);
-        setInterval((prevNum) => prevNum + 1);
-        if (interval === 3) {
+        if (interval > 3) {
+          console.log('lap');
           setVehiclesCounter((counter) => counter + 1);
-          setInterval(0);
+          getNextVehicles(newVehicles, vehiclesCounter);
+          setInterval(1);
+        } else {
+          console.log('interval++');
+          setInterval((prevNum) => prevNum + 1);
         }
       }
     }
@@ -50,9 +56,14 @@ const Cars = () => {
         color={0xa52523}
         playerScore={0}
       />
-      {newVehicles.map((vehicle) => {
+      {newVehicles.map((vehicle, i) => {
         const { reference, index, name, type, color } = vehicle;
 
+        let active = false;
+
+        if (i <= vehiclesCounter) {
+          active = true;
+        }
         return type === 'car' ? (
           <Car
             key={name}
@@ -61,6 +72,7 @@ const Cars = () => {
             name={name}
             props={carProps}
             color={color}
+            active={active}
           />
         ) : (
           <Truck
@@ -70,6 +82,7 @@ const Cars = () => {
             name={name}
             props={truckProps}
             color={color}
+            active={active}
           />
         );
       })}
