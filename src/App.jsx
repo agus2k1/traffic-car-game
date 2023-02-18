@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import Lights from './Components/Lights';
 import Cars from './Components/Cars';
 import Map from './Components/Map';
+import Score from './Components/Score';
 import { useGameContext } from './context/GameContext';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
           <Suspense fallback={null}>
             <Cars />
             <Map mapWidth={cameraWidth} mapHeight={cameraHeight * 2} />
+            <Score />
           </Suspense>
         </Canvas>
       </div>
