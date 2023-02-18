@@ -64,7 +64,7 @@ export const GameProvider = ({ children }) => {
   let decelerate = false;
 
   let playerAngleMoved = 0;
-  const playerSpeed = 1;
+  const playerSpeed = 1.5;
 
   let carAngleMoved = 0;
   let truckAngleMoved = 0;
@@ -123,21 +123,21 @@ export const GameProvider = ({ children }) => {
 
   controls();
 
-  const getInitialPositions = (player, otherVehicles, score) => {
+  const getInitialPositions = (player, otherVehicles, lap) => {
     initialPosition(player);
     otherVehicles.map((vehicle, index) => {
       const ref = vehicle.reference;
-      if (index <= score) {
+      if (index <= lap) {
         initialPosition(ref);
       }
     });
   };
 
-  const getNextVehicles = (otherVehicles, counter) => {
+  const getNextVehicles = (otherVehicles, lap) => {
     let position = 0;
     otherVehicles.map((vehicle, index) => {
       const ref = vehicle.reference;
-      if (index > counter) {
+      if (index > lap) {
         ref.current.position.x = -600 - 200 * position;
         ref.current.position.z = 300;
         position++;
