@@ -18,21 +18,21 @@ const Cars = () => {
     animateVehicles,
   } = useGameContext();
 
-  const [score, setScore] = useState(0);
+  const [lap, setLap] = useState(0);
   const [vehiclesCounter, setVehiclesCounter] = useState(1);
   const [interval, setInterval] = useState(1);
 
   useEffect(() => {
-    getInitialPositions(player, newVehicles, score);
-    getNextVehicles(newVehicles, score);
+    getInitialPositions(player, newVehicles, lap);
+    getNextVehicles(newVehicles, lap);
     getRefs(player, newVehicles);
   }, []);
 
   useFrame((state, delta) => {
     if (runGame && !showCollisionMessage) {
       animateVehicles(references, delta, vehiclesCounter);
-      if (player.current.userData.playerScore !== score) {
-        setScore(player.current.userData.playerScore);
+      if (player.current.userData.playerScore !== lap) {
+        setLap(player.current.userData.playerScore);
         if (interval > 3) {
           console.log('lap');
           setVehiclesCounter((counter) => counter + 1);
