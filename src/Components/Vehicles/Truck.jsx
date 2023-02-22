@@ -4,7 +4,7 @@ import {
   getTruckSideTexture,
 } from '../../assets/VehiclesTextures';
 
-const Truck = ({ reference, index, name, props, color, active }) => {
+const Truck = ({ index, name, props, color, active }) => {
   const {
     backWheelPosition,
     middleWheelPosition,
@@ -17,7 +17,7 @@ const Truck = ({ reference, index, name, props, color, active }) => {
   const { connectorPosition, connectorArgs, connectorColor } = props.connector;
 
   return (
-    <group ref={reference} name={name} userData={{ index, active }}>
+    <group name={name} userData={{ index, active }}>
       {/* Back Wheel */}
       <mesh position={backWheelPosition}>
         <boxGeometry attach="geometry" args={wheelArgs} />
