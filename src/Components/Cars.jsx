@@ -1,36 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Car from './Vehicles/Car';
 import Truck from './Vehicles/Truck';
 import { carProps, truckProps } from '../assets/VehiclesData';
 import { useGameContext } from '../context/GameContext';
 import { useFrame } from '@react-three/fiber';
+import { getRandomVehicles } from '../assets/VehiclesAnimations';
 
 const Cars = () => {
   const {
-    player,
+    scene,
     newVehicles,
     runGame,
     showCollisionMessage,
-    references,
     getInitialPositions,
     getNextVehicles,
-    getRefs,
-    animateVehicles,
+    animations,
+    setNewVehicles,
   } = useGameContext();
 
-  const [lap, setLap] = useState(0);
+  const player = useRef();
+
+  const [allVehicles, setAllVehicles] = useState([]);
   const [vehiclesCounter, setVehiclesCounter] = useState(1);
+  const [lap, setLap] = useState(0);
   const [interval, setInterval] = useState(1);
 
   useEffect(() => {
-    getInitialPositions(player, newVehicles, lap);
-    getNextVehicles(newVehicles, lap);
-    getRefs(player, newVehicles);
+    if (scene) {
+      const objects = scene.children.filter(
+        (vehicle) => vehicle.type === 'Group'
+      );
+      const vehicles = objects.filter((vehicle) => vehicle.name);
+      setAllVehicles(vehicles);
+    }
+  }, [scene]);
+
+  useEffect(() => {
+    setNewVehicles(getRandomVehicles(4));
   }, []);
+
+  useEffect(() => {
+    if (allVehicles) {
+      getInitialPositions(allVehicles, vehiclesCounter);
+      getNextVehicles(allVehicles, vehiclesCounter);
+    }
+  }, [allVehicles]);
 
   useFrame((state, delta) => {
     if (runGame && !showCollisionMessage) {
-      animateVehicles(references, delta, vehiclesCounter);
+      animations(state, delta, vehiclesCounter);
       if (player.current.userData.playerScore !== lap) {
         setLap(player.current.userData.playerScore);
         if (interval > 3) {
@@ -49,43 +67,43 @@ const Cars = () => {
   return (
     <>
       <Car
-        reference={player}
+        playerRef={player}
         index={0}
         name={'player'}
         props={carProps}
         color={0xa52523}
         playerScore={0}
       />
-      {newVehicles.map((vehicle, i) => {
-        const { reference, index, name, type, color } = vehicle;
+      {newVehicles &&
+        newVehicles.map((vehicle, i) => {
+          const { index, name, type, color } = vehicle;
 
-        let active = false;
+          let active = false;
 
-        if (i <= vehiclesCounter) {
-          active = true;
-        }
-        return type === 'car' ? (
-          <Car
-            key={name}
-            reference={reference}
-            index={index}
-            name={name}
-            props={carProps}
-            color={color}
-            active={active}
-          />
-        ) : (
-          <Truck
-            key={name}
-            reference={reference}
-            index={index}
-            name={name}
-            props={truckProps}
-            color={color}
-            active={active}
-          />
-        );
-      })}
+          if (i <= vehiclesCounter) {
+            active = true;
+          }
+
+          return type === 'car' ? (
+            <Car
+              key={name}
+              index={index}
+              name={name}
+              props={carProps}
+              color={color}
+              active={active}
+            />
+          ) : (
+            <Truck
+              key={name}
+              index={index}
+              name={name}
+              props={truckProps}
+              color={color}
+              active={active}
+            />
+          );
+        })}
     </>
   );
 };
