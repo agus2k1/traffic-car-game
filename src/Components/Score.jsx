@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import { useGameContext } from '../context/GameContext';
 
 const Score = () => {
-  const { player, runGame, showCollisionMessage } = useGameContext();
+  const { runGame, showCollisionMessage } = useGameContext();
   const { nodes, materials } = useGLTF('/numbers.glb');
 
   const [lapsCounter, setLapsCounter] = useState(0);
@@ -12,10 +12,13 @@ const Score = () => {
   const [secondDigitObj, setSecondDigitObj] = useState(nodes['0']);
   const [numberHasTwoDigits, setNumberHasTwoDigits] = useState(false);
 
-  useFrame(() => {
+  useFrame((state) => {
     if (runGame && !showCollisionMessage) {
-      if (player.current.userData.playerScore !== lapsCounter) {
-        const score = player.current.userData.playerScore;
+      const player = state.scene.children.find(
+        (children) => children.name === 'player'
+      );
+      if (player.userData.playerScore !== lapsCounter) {
+        const score = player.userData.playerScore;
 
         if (score < 10) {
           setSecondDigitObj(nodes[score.toString()]);
