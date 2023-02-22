@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Lights from './Components/Lights';
@@ -8,10 +8,19 @@ import Score from './Components/Score';
 import { useGameContext } from './context/GameContext';
 
 function App() {
-  const { showCollisionMessage } = useGameContext();
+  const { showCollisionMessage, controls, setScene } = useGameContext();
   const aspectRatio = window.innerWidth / window.innerHeight;
   const cameraWidth = 2000;
   const cameraHeight = cameraWidth / aspectRatio;
+
+  useEffect(() => {
+    controls();
+
+    return () => {
+      window.removeEventListener('keydown', () => {});
+      window.removeEventListener('keyup', () => {});
+    };
+  }, [controls]);
 
   return (
     <>
@@ -23,6 +32,9 @@ function App() {
       )}
       <div className={`game ${showCollisionMessage ? 'lost' : ''}`}>
         <Canvas
+          onCreated={({ scene }) => {
+            setScene(scene);
+          }}
           orthographic
           camera={{
             position: [0, 300, -210],
