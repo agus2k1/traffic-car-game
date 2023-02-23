@@ -61,7 +61,7 @@ const Score = ({ player }) => {
           (vehicle) => !vehicle.userData.active
         );
 
-        if (interval > 3) {
+        if (interval > 2) {
           nextVehicleIndex > -1
             ? (allVehicles[nextVehicleIndex].userData.active = true)
             : null;
