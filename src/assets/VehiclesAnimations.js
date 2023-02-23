@@ -1,8 +1,5 @@
 import { trackRadius, arcCenterX } from './MapTexture';
 
-let playerAngleMoved = 0;
-let carAngleMoved = 0;
-let truckAngleMoved = 0;
 const carSpeed = 0.5;
 const truckSpeed = 0.8;
 
@@ -15,18 +12,18 @@ const truckSpaceBetween = 10;
 
 // -----------------------Animate vehicles-----------------------
 
-export const animateVehicles = (state, delta, vehiclesCounter, speed) => {
+export const animateVehicles = (state, delta, playerSpeed) => {
   hitZonesArray = [];
 
   const children = state.scene.children;
   const vehicles = children.filter((child) => child.type === 'Group');
 
-  vehicles.map((vehicle, index) => {
-    if (index <= vehiclesCounter) {
+  vehicles.map((vehicle) => {
+    if (vehicle.userData.active) {
       if (vehicle.name === 'player') {
         const player = vehicle;
-        player.userData.playerScore = getScore(playerAngleMoved);
-        setVehicle(player, player.name, speed, delta, Math.PI * 2);
+        player.userData.playerScore = getScore(player.userData.angleMoved);
+        setVehicle(player, player.name, playerSpeed, delta, Math.PI * 2);
       } else if (vehicle.name.includes('car')) {
         const car = vehicle;
         const i = vehicle.userData.index;
@@ -56,16 +53,16 @@ export const animateVehicles = (state, delta, vehiclesCounter, speed) => {
 
 const setVehicle = (object, name, speed, delta, angleInitial) => {
   name === 'player'
-    ? (playerAngleMoved += speed * delta)
+    ? (object.userData.angleMoved += speed * delta)
     : name.includes('car')
-    ? (carAngleMoved -= speed * delta)
-    : (truckAngleMoved -= speed * delta);
+    ? (object.userData.angleMoved -= speed * delta)
+    : (object.userData.angleMoved -= speed * delta);
   const totalAngle =
     name === 'player'
-      ? angleInitial + playerAngleMoved
+      ? angleInitial + object.userData.angleMoved
       : name.includes('car')
-      ? angleInitial - carAngleMoved
-      : angleInitial - truckAngleMoved;
+      ? angleInitial - object.userData.angleMoved
+      : angleInitial - object.userData.angleMoved;
 
   const x =
     name === 'player'
@@ -163,4 +160,35 @@ export const getRandomVehicles = (amount) => {
   }
 
   return vehiclesArray;
+};
+
+// -----------------------Position vehicles-----------------------
+
+export const initialPosition = (vehicle) => {
+  if (vehicle.name === 'player') {
+    const player = vehicle;
+    player.position.x = Math.cos(Math.PI * 2) * (trackRadius + 30) + arcCenterX;
+    player.position.z = Math.sin(Math.PI * 2) * (trackRadius + 30);
+    player.rotation.y = -(Math.PI * 2) - Math.PI / 2;
+  } else if (vehicle.name.includes('car')) {
+    const car = vehicle;
+    const i = vehicle.userData.index;
+    car.position.x =
+      Math.cos(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30) -
+      arcCenterX;
+    car.position.z =
+      Math.sin(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30);
+    car.rotation.y = -(Math.PI / (2 * i) + i * carSpaceBetween) - Math.PI / 2;
+  } else if (vehicle.name.includes('truck')) {
+    const truck = vehicle;
+    const i = vehicle.userData.index;
+    truck.position.x =
+      Math.cos(-Math.PI / (2 * i) + i * truckSpaceBetween) *
+        (trackRadius - 30) -
+      arcCenterX;
+    truck.position.z =
+      Math.sin(-Math.PI / (2 * i) + i * truckSpaceBetween) * (trackRadius - 30);
+    truck.rotation.y =
+      -(-Math.PI / (2 * i) + i * truckSpaceBetween) - Math.PI / 2;
+  }
 };
