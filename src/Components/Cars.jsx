@@ -9,22 +9,22 @@ import { getRandomVehicles } from '../assets/VehiclesAnimations';
 const Cars = () => {
   const {
     scene,
-    newVehicles,
+    enemyVehicles,
     runGame,
+    restartGame,
     showCollisionMessage,
-    getInitialPositions,
-    getNextVehicles,
+    getVehiclesPosition,
     animations,
-    setNewVehicles,
+    setEnemyVehicles,
   } = useGameContext();
 
   const player = useRef();
 
   const [allVehicles, setAllVehicles] = useState([]);
-  const [vehiclesCounter, setVehiclesCounter] = useState(1);
+  const [enemyVehiclesCounter, setEnemyVehiclesCounter] = useState(1);
   const [lap, setLap] = useState(0);
-  const [interval, setInterval] = useState(1);
 
+  // Gets all the vehicles in the scene
   useEffect(() => {
     if (scene) {
       const objects = scene.children.filter(
@@ -32,34 +32,38 @@ const Cars = () => {
       );
       const vehicles = objects.filter((vehicle) => vehicle.name);
       setAllVehicles(vehicles);
+      player.current.userData.playerScore = 0;
+      console.log(player.current.userData.playerScore);
+      setLap(0);
     }
   }, [scene]);
 
   useEffect(() => {
-    setNewVehicles(getRandomVehicles(4));
-  }, []);
+    setEnemyVehicles(getRandomVehicles(4));
+  }, [restartGame]);
 
   useEffect(() => {
-    if (allVehicles) {
-      getInitialPositions(allVehicles, vehiclesCounter);
-      getNextVehicles(allVehicles, vehiclesCounter);
+    if (allVehicles || restartGame) {
+      lap > 0
+        ? getVehiclesPosition(allVehicles, false)
+        : getVehiclesPosition(allVehicles, true);
     }
-  }, [allVehicles]);
+  }, [allVehicles, enemyVehiclesCounter, restartGame]);
 
   useFrame((state, delta) => {
     if (runGame && !showCollisionMessage) {
-      animations(state, delta, vehiclesCounter);
+      animations(state, delta);
+
       if (player.current.userData.playerScore !== lap) {
-        setLap(player.current.userData.playerScore);
-        if (interval > 3) {
-          console.log('lap');
-          setVehiclesCounter((counter) => counter + 1);
-          getNextVehicles(newVehicles, vehiclesCounter);
-          setInterval(1);
-        } else {
-          console.log('interval++');
-          setInterval((prevNum) => prevNum + 1);
-        }
+        const score = player.current.userData.playerScore;
+        const objects = state.scene.children.filter(
+          (object) => object.type === 'Group'
+        );
+        const activeVehicles = objects.filter(
+          (vehicle) => vehicle.userData.active
+        );
+        // setLap(score);
+        // setEnemyVehiclesCounter(activeVehicles);
       }
     }
   });
@@ -73,37 +77,40 @@ const Cars = () => {
         props={carProps}
         color={0xa52523}
         playerScore={0}
+        angleMoved={0}
+        active={true}
       />
-      {newVehicles &&
-        newVehicles.map((vehicle, i) => {
-          const { index, name, type, color } = vehicle;
+      {enemyVehicles.map((vehicle, i) => {
+        const { index, name, type, color } = vehicle;
 
-          let active = false;
+        let active = false;
 
-          if (i <= vehiclesCounter) {
-            active = true;
-          }
+        if (i + 1 <= enemyVehiclesCounter) {
+          active = true;
+        }
 
-          return type === 'car' ? (
-            <Car
-              key={name}
-              index={index}
-              name={name}
-              props={carProps}
-              color={color}
-              active={active}
-            />
-          ) : (
-            <Truck
-              key={name}
-              index={index}
-              name={name}
-              props={truckProps}
-              color={color}
-              active={active}
-            />
-          );
-        })}
+        return type === 'car' ? (
+          <Car
+            key={name}
+            index={index}
+            name={name}
+            props={carProps}
+            color={color}
+            angleMoved={0}
+            active={active}
+          />
+        ) : (
+          <Truck
+            key={name}
+            index={index}
+            name={name}
+            props={truckProps}
+            color={color}
+            angleMoved={0}
+            active={active}
+          />
+        );
+      })}
     </>
   );
 };
