@@ -17,7 +17,7 @@ const Truck = ({ index, name, props, color, active }) => {
   const { connectorPosition, connectorArgs, connectorColor } = props.connector;
 
   return (
-    <group name={name} userData={{ index, active }}>
+    <group name={name} userData={{ index, angleMoved: 0, active }}>
       {/* Back Wheel */}
       <mesh position={backWheelPosition}>
         <boxGeometry attach="geometry" args={wheelArgs} />
