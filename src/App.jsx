@@ -7,7 +7,7 @@ import Map from './Components/Map';
 import Score from './Components/Score';
 import { useGameContext } from './context/GameContext';
 
-function App() {
+const App = () => {
   const { showCollisionMessage, controls, setScene, restartGame } =
     useGameContext();
   const aspectRatio = window.innerWidth / window.innerHeight;
@@ -70,7 +70,7 @@ function App() {
       </div>
     </>
   );
-}
+};
 
 export default App;
 
