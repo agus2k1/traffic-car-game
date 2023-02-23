@@ -1,7 +1,7 @@
 import { trackRadius, arcCenterX } from './MapTexture';
 
-const carSpeed = 0.5;
-const truckSpeed = 0.8;
+const carSpeed = 1.2;
+const truckSpeed = 1;
 
 let playerHitZoneFront;
 let playerHitZoneBack;
@@ -26,23 +26,21 @@ export const animateVehicles = (state, delta, playerSpeed) => {
         setVehicle(player, player.name, playerSpeed, delta, Math.PI * 2);
       } else if (vehicle.name.includes('car')) {
         const car = vehicle;
-        const i = vehicle.userData.index;
         setVehicle(
           car,
           car.name,
           carSpeed,
           delta,
-          Math.PI / (2 * i) + i * carSpaceBetween
+          Math.PI / 2 + carSpaceBetween
         );
       } else if (vehicle.name.includes('truck')) {
         const truck = vehicle;
-        const i = vehicle.userData.index;
         setVehicle(
           truck,
           truck.name,
           truckSpeed,
           delta,
-          -Math.PI / (2 * i) + i * truckSpaceBetween
+          -Math.PI / 2 + truckSpaceBetween
         );
       }
     } else {
@@ -75,9 +73,11 @@ const setVehicle = (object, name, speed, delta, angleInitial) => {
       ? Math.sin(totalAngle) * (trackRadius + 30)
       : Math.sin(totalAngle) * (trackRadius - 30);
 
+  const y = name === 'player' ? -totalAngle : -totalAngle - Math.PI / 2;
+
   object.position.x = x;
   object.position.z = z;
-  object.rotation.y = -totalAngle - Math.PI / 2;
+  object.rotation.y = y;
 
   name === 'player'
     ? (playerHitZoneFront = getHitZonePosition(object.position, totalAngle, 15))
@@ -168,26 +168,21 @@ export const initialPosition = (vehicle) => {
     const player = vehicle;
     player.position.x = Math.cos(Math.PI * 2) * (trackRadius + 30) + arcCenterX;
     player.position.z = Math.sin(Math.PI * 2) * (trackRadius + 30);
-    player.rotation.y = -(Math.PI * 2) - Math.PI / 2;
+    player.rotation.y = 0;
   } else if (vehicle.name.includes('car')) {
     const car = vehicle;
-    const i = vehicle.userData.index;
     car.position.x =
-      Math.cos(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30) -
-      arcCenterX;
+      Math.cos(Math.PI / 2 + carSpaceBetween) * (trackRadius + 30) - arcCenterX;
     car.position.z =
-      Math.sin(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30);
-    car.rotation.y = -(Math.PI / (2 * i) + i * carSpaceBetween) - Math.PI / 2;
+      Math.sin(Math.PI / 2 + carSpaceBetween) * (trackRadius + 30);
+    car.rotation.y = -(Math.PI / 2 + carSpaceBetween) - Math.PI / 2;
   } else if (vehicle.name.includes('truck')) {
     const truck = vehicle;
-    const i = vehicle.userData.index;
     truck.position.x =
-      Math.cos(-Math.PI / (2 * i) + i * truckSpaceBetween) *
-        (trackRadius - 30) -
+      Math.cos(-Math.PI / 2 + truckSpaceBetween) * (trackRadius - 30) -
       arcCenterX;
     truck.position.z =
-      Math.sin(-Math.PI / (2 * i) + i * truckSpaceBetween) * (trackRadius - 30);
-    truck.rotation.y =
-      -(-Math.PI / (2 * i) + i * truckSpaceBetween) - Math.PI / 2;
+      Math.sin(-Math.PI / 2 + truckSpaceBetween) * (trackRadius - 30);
+    truck.rotation.y = -(-Math.PI / 2 + truckSpaceBetween) - Math.PI / 2;
   }
 };
