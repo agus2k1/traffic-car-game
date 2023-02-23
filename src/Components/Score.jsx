@@ -9,7 +9,6 @@ const Score = ({ player }) => {
     runGame,
     restartGame,
     showCollisionMessage,
-    setRestartGame,
     getVehiclesPosition,
   } = useGameContext();
   const { nodes, materials } = useGLTF('/numbers.glb');
@@ -37,9 +36,6 @@ const Score = ({ player }) => {
       setSecondDigitObj(nodes['0']);
       setNumberHasTwoDigits(false);
       setEnemyVehiclesCounter(1);
-    }
-    if (restartGame) {
-      setRestartGame(false);
     }
   }, [scene, restartGame]);
 
