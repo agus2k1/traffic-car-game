@@ -3,30 +3,58 @@ import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useGameContext } from '../context/GameContext';
 
-const Score = () => {
-  const { runGame, showCollisionMessage, restartGame } = useGameContext();
+const Score = ({ player }) => {
+  const {
+    scene,
+    runGame,
+    restartGame,
+    showCollisionMessage,
+    setRestartGame,
+    getVehiclesPosition,
+  } = useGameContext();
   const { nodes, materials } = useGLTF('/numbers.glb');
 
-  const [lapsCounter, setLapsCounter] = useState(0);
-  const [interval, setInterval] = useState(1);
   const [firstDigitObj, setFirstDigitObj] = useState(nodes['1']);
   const [secondDigitObj, setSecondDigitObj] = useState(nodes['0']);
   const [numberHasTwoDigits, setNumberHasTwoDigits] = useState(false);
+  const [lapsCounter, setLapsCounter] = useState(0);
+  const [interval, setInterval] = useState(1);
+  const [allVehicles, setAllVehicles] = useState([]);
+  const [enemyVehiclesCounter, setEnemyVehiclesCounter] = useState(1);
+
+  // Gets all the vehicles in the scene
+  useEffect(() => {
+    if (scene) {
+      const objects = scene.children.filter(
+        (vehicle) => vehicle.type === 'Group'
+      );
+      const vehicles = objects.filter((vehicle) => vehicle.name);
+      setAllVehicles(vehicles);
+      player.current.userData.playerScore = 0;
+      setLapsCounter(0);
+      setInterval(1);
+      setFirstDigitObj(nodes['1']);
+      setSecondDigitObj(nodes['0']);
+      setNumberHasTwoDigits(false);
+      setEnemyVehiclesCounter(1);
+    }
+    if (restartGame) {
+      setRestartGame(false);
+    }
+  }, [scene, restartGame]);
 
   useEffect(() => {
-    setLapsCounter(0);
-    setFirstDigitObj(nodes['1']);
-    setSecondDigitObj(nodes['0']);
-    setNumberHasTwoDigits(false);
-  }, [restartGame]);
+    if (allVehicles || restartGame) {
+      lapsCounter > 0
+        ? getVehiclesPosition(allVehicles, false)
+        : getVehiclesPosition(allVehicles, true);
+    }
+  }, [allVehicles, enemyVehiclesCounter]);
 
   useFrame((state) => {
     if (runGame && !showCollisionMessage) {
-      const player = state.scene.children.find(
-        (children) => children.name === 'player'
-      );
-      if (player.userData.playerScore !== lapsCounter) {
-        const score = player.userData.playerScore;
+      if (player.current.userData.playerScore !== lapsCounter) {
+        const score = player.current.userData.playerScore;
         setLapsCounter(score);
 
         const allVehicles = state.scene.children.filter(
@@ -38,12 +66,14 @@ const Score = () => {
         );
 
         if (interval > 3) {
-          console.log('spawn vehicle');
-          allVehicles[nextVehicleIndex].userData.active = true;
-
+          nextVehicleIndex > -1
+            ? (allVehicles[nextVehicleIndex].userData.active = true)
+            : null;
           setInterval(1);
+          setEnemyVehiclesCounter((prevNum) => prevNum + 1);
+          console.log('spawn vehicle');
         } else {
-          console.log('interval++');
+          console.log(interval);
           setInterval((prevNum) => prevNum + 1);
         }
 
