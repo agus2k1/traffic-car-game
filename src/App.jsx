@@ -1,17 +1,20 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Lights from './Components/Lights';
-import Cars from './Components/Cars';
+import Vehicles from './Components/Vehicles';
 import Map from './Components/Map';
 import Score from './Components/Score';
 import { useGameContext } from './context/GameContext';
 
 function App() {
-  const { showCollisionMessage, controls, setScene } = useGameContext();
+  const { showCollisionMessage, controls, setScene, restartGame } =
+    useGameContext();
   const aspectRatio = window.innerWidth / window.innerHeight;
   const cameraWidth = 2000;
   const cameraHeight = cameraWidth / aspectRatio;
+
+  const player = useRef();
 
   useEffect(() => {
     controls();
@@ -20,7 +23,7 @@ function App() {
       window.removeEventListener('keydown', () => {});
       window.removeEventListener('keyup', () => {});
     };
-  }, [controls]);
+  }, [controls, restartGame]);
 
   return (
     <>
@@ -52,9 +55,9 @@ function App() {
           <Lights />
           <OrbitControls />
           <Suspense fallback={null}>
-            <Cars />
+            <Vehicles player={player} />
             <Map mapWidth={cameraWidth} mapHeight={cameraHeight * 2} />
-            <Score />
+            <Score player={player} />
           </Suspense>
         </Canvas>
       </div>
