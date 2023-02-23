@@ -145,7 +145,6 @@ const randomVehicle = () => {
   const name = type === 'car' ? `car-${carNumber}` : `truck-${truckNumber}`;
 
   return {
-    index: type === 'car' ? carNumber : truckNumber,
     name,
     type,
     color,
