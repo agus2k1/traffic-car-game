@@ -5,6 +5,7 @@ import { carProps, truckProps } from '../assets/VehiclesData';
 import { useGameContext } from '../context/GameContext';
 import { useFrame } from '@react-three/fiber';
 import { getRandomVehicles } from '../assets/VehiclesAnimations';
+import PlayerCar from './PlayerCar';
 
 const Vehicles = ({ player }) => {
   const {
@@ -19,7 +20,7 @@ const Vehicles = ({ player }) => {
 
   useEffect(() => {
     if (!runGame) {
-      setEnemyVehicles(getRandomVehicles(4));
+      setEnemyVehicles(getRandomVehicles(8));
       setEnemyVehiclesOnStart(1);
     }
   }, [runGame]);
@@ -32,7 +33,7 @@ const Vehicles = ({ player }) => {
 
   return (
     <>
-      <Car
+      <PlayerCar
         playerRef={player}
         index={0}
         name={'player'}
@@ -42,6 +43,16 @@ const Vehicles = ({ player }) => {
         angleMoved={0}
         active={true}
       />
+      {/* <Car
+        playerRef={player}
+        index={0}
+        name={'player'}
+        props={carProps}
+        color={0xa52523}
+        playerScore={0}
+        angleMoved={0}
+        active={true}
+      /> */}
       {enemyVehicles.map((vehicle, index) => {
         const { name, type, color } = vehicle;
 
