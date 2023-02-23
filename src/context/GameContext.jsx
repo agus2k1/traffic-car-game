@@ -1,6 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { trackRadius, arcCenterX } from '../assets/MapTexture';
-import { animateVehicles, checkCollision } from '../assets/VehiclesAnimations';
+import {
+  animateVehicles,
+  checkCollision,
+  initialPosition,
+} from '../assets/VehiclesAnimations';
 
 const GameContext = React.createContext(null);
 
@@ -8,12 +11,10 @@ export const useGameContext = () => {
   return useContext(GameContext);
 };
 
-const carSpaceBetween = 5;
-const truckSpaceBetween = 10;
-
 export const GameProvider = ({ children }) => {
   const [runGame, setRunGame] = useState(false);
-  const [newVehicles, setNewVehicles] = useState();
+  const [restartGame, setRestartGame] = useState(false);
+  const [enemyVehicles, setEnemyVehicles] = useState([]);
   const [showCollisionMessage, setShowCollisionMessage] = useState(false);
   const [scene, setScene] = useState();
 
@@ -28,6 +29,7 @@ export const GameProvider = ({ children }) => {
         if (!accelerate) {
           if (!runGame) {
             setRunGame(true);
+            setRestartGame(false);
           }
           accelerate = true;
           return;
@@ -43,6 +45,7 @@ export const GameProvider = ({ children }) => {
       if (e.key === 'R' || e.key === 'r') {
         if (!runGame && showCollisionMessage) {
           setShowCollisionMessage(false);
+          setRestartGame(true);
           // setNewVehicles(getRandomVehicles(4));
           // getInitialPositions(player, newVehicles);
         }
@@ -66,57 +69,25 @@ export const GameProvider = ({ children }) => {
     });
   };
 
-  const getInitialPositions = (vehicles, numberOfVehicles) => {
-    vehicles.map((vehicle, index) => {
-      if (index <= numberOfVehicles) {
+  const getVehiclesPosition = (vehicles, isGameStarting) => {
+    if (isGameStarting) {
+      const activeVehicles = vehicles.filter(
+        (vehicle) => vehicle.userData.active
+      );
+      activeVehicles.map((vehicle) => {
         initialPosition(vehicle);
-      }
-    });
-  };
-
-  const getNextVehicles = (otherVehicles, numberOfVehicles) => {
-    let position = 0;
-    otherVehicles.map((vehicle, index) => {
-      if (index > numberOfVehicles) {
-        vehicle.position.x = -600 - 200 * position;
-        vehicle.position.z = 300;
-        position++;
-      }
-    });
-  };
-
-  const initialPosition = (vehicle) => {
-    if (vehicle.name === 'player') {
-      const player = vehicle;
-      player.position.x =
-        Math.cos(Math.PI * 2) * (trackRadius + 30) + arcCenterX;
-      player.position.z = Math.sin(Math.PI * 2) * (trackRadius + 30);
-      player.rotation.y = -(Math.PI * 2) - Math.PI / 2;
-    } else if (vehicle.name.includes('car')) {
-      const car = vehicle;
-      const i = vehicle.userData.index;
-      car.position.x =
-        Math.cos(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30) -
-        arcCenterX;
-      car.position.z =
-        Math.sin(Math.PI / (2 * i) + i * carSpaceBetween) * (trackRadius + 30);
-      car.rotation.y = -(Math.PI / (2 * i) + i * carSpaceBetween) - Math.PI / 2;
-    } else if (vehicle.name.includes('truck')) {
-      const truck = vehicle;
-      const i = vehicle.userData.index;
-      truck.position.x =
-        Math.cos(-Math.PI / (2 * i) + i * truckSpaceBetween) *
-          (trackRadius - 30) -
-        arcCenterX;
-      truck.position.z =
-        Math.sin(-Math.PI / (2 * i) + i * truckSpaceBetween) *
-        (trackRadius - 30);
-      truck.rotation.y =
-        -(-Math.PI / (2 * i) + i * truckSpaceBetween) - Math.PI / 2;
+      });
     }
+
+    const nextVehicles = vehicles.filter((vehicle) => !vehicle.userData.active);
+
+    nextVehicles.map((vehicle, index) => {
+      vehicle.position.x = -600 - 200 * index;
+      vehicle.position.z = 300;
+    });
   };
 
-  const animations = (state, delta, vehiclesCounter) => {
+  const animations = (state, delta) => {
     if (checkCollision()) {
       setShowCollisionMessage(true);
       setRunGame(false);
@@ -128,7 +99,7 @@ export const GameProvider = ({ children }) => {
     };
 
     const speed = getPlayerSpeed();
-    animateVehicles(state, delta, vehiclesCounter, speed);
+    animateVehicles(state, delta, speed);
   };
 
   return (
@@ -136,14 +107,13 @@ export const GameProvider = ({ children }) => {
       value={{
         scene,
         runGame,
-        newVehicles,
+        restartGame,
+        enemyVehicles,
         showCollisionMessage,
         controls,
-        initialPosition,
-        getInitialPositions,
-        getNextVehicles,
+        getVehiclesPosition,
         animations,
-        setNewVehicles,
+        setEnemyVehicles,
         setScene,
       }}
     >
