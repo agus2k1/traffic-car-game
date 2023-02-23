@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useGameContext } from '../context/GameContext';
 
 const Score = () => {
-  const { runGame, showCollisionMessage } = useGameContext();
+  const { runGame, showCollisionMessage, restartGame } = useGameContext();
   const { nodes, materials } = useGLTF('/numbers.glb');
 
   const [lapsCounter, setLapsCounter] = useState(0);
+  const [interval, setInterval] = useState(1);
   const [firstDigitObj, setFirstDigitObj] = useState(nodes['1']);
   const [secondDigitObj, setSecondDigitObj] = useState(nodes['0']);
   const [numberHasTwoDigits, setNumberHasTwoDigits] = useState(false);
+
+  useEffect(() => {
+    setLapsCounter(0);
+    setFirstDigitObj(nodes['1']);
+    setSecondDigitObj(nodes['0']);
+    setNumberHasTwoDigits(false);
+  }, [restartGame]);
 
   useFrame((state) => {
     if (runGame && !showCollisionMessage) {
@@ -19,6 +27,25 @@ const Score = () => {
       );
       if (player.userData.playerScore !== lapsCounter) {
         const score = player.userData.playerScore;
+        setLapsCounter(score);
+
+        const allVehicles = state.scene.children.filter(
+          (vehicle) => vehicle.type === 'Group'
+        );
+
+        const nextVehicleIndex = allVehicles.findIndex(
+          (vehicle) => !vehicle.userData.active
+        );
+
+        if (interval > 3) {
+          console.log('spawn vehicle');
+          allVehicles[nextVehicleIndex].userData.active = true;
+
+          setInterval(1);
+        } else {
+          console.log('interval++');
+          setInterval((prevNum) => prevNum + 1);
+        }
 
         if (score < 10) {
           setSecondDigitObj(nodes[score.toString()]);
@@ -29,7 +56,6 @@ const Score = () => {
           setSecondDigitObj(nodes[secondDigit.toString()]);
           setNumberHasTwoDigits(true);
         }
-        setLapsCounter(score);
       }
     }
   });
