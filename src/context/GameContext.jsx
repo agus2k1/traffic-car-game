@@ -81,25 +81,27 @@ export const GameProvider = ({ children }) => {
 
     const nextVehicles = vehicles.filter((vehicle) => !vehicle.userData.active);
 
-    nextVehicles.map((vehicle, index) => {
+    nextVehicles?.map((vehicle, index) => {
       vehicle.position.x = -600 - 200 * index;
       vehicle.position.z = 300;
     });
   };
 
   const animations = (state, delta) => {
-    if (checkCollision()) {
-      setShowCollisionMessage(true);
-      setRunGame(false);
-    }
     const getPlayerSpeed = () => {
       if (accelerate) return playerSpeed * 2;
       if (decelerate) return playerSpeed * 0.5;
       return playerSpeed;
     };
-
     const speed = getPlayerSpeed();
+
+    // Animation
     animateVehicles(state, delta, speed);
+    // Collision between vehicles
+    if (checkCollision()) {
+      setShowCollisionMessage(true);
+      setRunGame(false);
+    }
   };
 
   return (
