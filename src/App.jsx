@@ -5,10 +5,11 @@ import Lights from './Components/Lights';
 import Vehicles from './Components/Vehicles';
 import Map from './Components/Map';
 import Score from './Components/Score';
+import CarChoice from './Components/CarChoice';
 import { useGameContext } from './context/GameContext';
 
 const App = () => {
-  const { showCollisionMessage, controls, setScene, restartGame } =
+  const { displayCars, restartGame, showCollisionMessage, controls, setScene } =
     useGameContext();
   const aspectRatio = window.innerWidth / window.innerHeight;
   const cameraWidth = 2000;
@@ -54,10 +55,17 @@ const App = () => {
         >
           <Lights />
           <OrbitControls />
+          {!displayCars && (
+            <Suspense fallback={null}>
+              <Vehicles player={player} />
+              <Score player={player} />
+            </Suspense>
+          )}
           <Suspense fallback={null}>
-            <Vehicles player={player} />
             <Map mapWidth={cameraWidth} mapHeight={cameraHeight * 2} />
-            <Score player={player} />
+            <CarChoice name={'Camaro'} position={3} />
+            <CarChoice name={'Wagon'} position={2} />
+            <CarChoice name={'default'} position={1} />
           </Suspense>
         </Canvas>
       </div>
