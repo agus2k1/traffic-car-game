@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Car from './Vehicles/Car';
-import Truck from './Vehicles/Truck';
+import DefaultCar from './Vehicles/DefaultCar';
+import DefaultTruck from './Vehicles/DefaultTruck';
 import { carProps, truckProps } from '../assets/VehiclesData';
 import { useGameContext } from '../context/GameContext';
 import { useFrame } from '@react-three/fiber';
 import { getRandomVehicles } from '../assets/VehiclesAnimations';
-import PlayerCar from './PlayerCar';
+import Wagon from './Vehicles/Wagon';
+import Camaro from './Vehicles/Camaro';
 
 const Vehicles = ({ player }) => {
   const {
@@ -33,7 +34,7 @@ const Vehicles = ({ player }) => {
 
   return (
     <>
-      <PlayerCar
+      <Camaro
         playerRef={player}
         index={0}
         name={'player'}
@@ -43,6 +44,16 @@ const Vehicles = ({ player }) => {
         angleMoved={0}
         active={true}
       />
+      {/* <Wagon
+        playerRef={player}
+        index={0}
+        name={'player'}
+        props={carProps}
+        color={0xa52523}
+        playerScore={0}
+        angleMoved={0}
+        active={true}
+      /> */}
       {/* <Car
         playerRef={player}
         index={0}
@@ -63,7 +74,7 @@ const Vehicles = ({ player }) => {
         }
 
         return type === 'car' ? (
-          <Car
+          <DefaultCar
             key={name}
             index={index + 1}
             name={name}
@@ -73,7 +84,7 @@ const Vehicles = ({ player }) => {
             active={active}
           />
         ) : (
-          <Truck
+          <DefaultTruck
             key={name}
             index={index + 1}
             name={name}
