@@ -157,3 +157,15 @@ export const getOuterField = (mapWidth, mapHeight) => {
 
   return field;
 };
+
+export const getField = (mapWidth, mapHeight) => {
+  const field = new THREE.Shape();
+
+  field.moveTo(-mapWidth / 2, -mapHeight / 2);
+
+  field.lineTo(mapWidth / 2, -mapHeight / 2);
+  field.lineTo(mapWidth / 2, mapHeight / 2);
+  field.lineTo(-mapWidth / 2, mapHeight / 2);
+
+  return field;
+};
