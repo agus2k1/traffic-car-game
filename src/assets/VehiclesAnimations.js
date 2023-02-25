@@ -73,7 +73,10 @@ const setVehicle = (object, name, speed, delta, angleInitial) => {
       ? Math.sin(totalAngle) * (trackRadius + 30)
       : Math.sin(totalAngle) * (trackRadius - 30);
 
-  const y = name === 'player' ? -totalAngle : -totalAngle - Math.PI / 2;
+  const y =
+    name === 'player' || name.includes('car')
+      ? -totalAngle
+      : -totalAngle - Math.PI / 2;
 
   object.position.x = x;
   object.position.z = z;
@@ -175,7 +178,7 @@ export const initialPosition = (vehicle) => {
       Math.cos(Math.PI / 2 + carSpaceBetween) * (trackRadius + 30) - arcCenterX;
     car.position.z =
       Math.sin(Math.PI / 2 + carSpaceBetween) * (trackRadius + 30);
-    car.rotation.y = -(Math.PI / 2 + carSpaceBetween) - Math.PI / 2;
+    car.rotation.y = Math.PI / 3 + carSpaceBetween;
   } else if (vehicle.name.includes('truck')) {
     const truck = vehicle;
     truck.position.x =
