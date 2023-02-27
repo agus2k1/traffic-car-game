@@ -1,11 +1,11 @@
 import React from 'react';
 import { useGLTF } from '@react-three/drei';
 
-const Chevrolet = () => {
+const Chevrolet = ({ position }) => {
   const { nodes, materials } = useGLTF('/chevrolet-logo.glb');
   return (
     <group dispose={null}>
-      <group position={[-450, 11, -300]} scale={[30, 10, 30]}>
+      <group position={[position, 11, -300]} scale={[30, 10, 30]}>
         <mesh
           castShadow
           receiveShadow
