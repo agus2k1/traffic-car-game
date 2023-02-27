@@ -5,9 +5,8 @@ import Lights from './Components/Lights';
 import Vehicles from './Components/Vehicles';
 import Map from './Components/Map';
 import Score from './Components/Score';
-import CarChoice from './Components/CarChoice';
+import PlayerCarOptions from './Components/PlayerCarOptions';
 import { useGameContext } from './context/GameContext';
-import Logos from './Components/Logos';
 
 const App = () => {
   const { displayCars, restartGame, showCollisionMessage, controls, setScene } =
@@ -64,10 +63,7 @@ const App = () => {
           )}
           <Suspense fallback={null}>
             <Map mapWidth={cameraWidth} mapHeight={cameraHeight * 2} />
-            <CarChoice name={'Camaro'} position={3} />
-            <CarChoice name={'Wagon'} position={2} />
-            <CarChoice name={'default'} position={1} />
-            <Logos />
+            <PlayerCarOptions />
           </Suspense>
         </Canvas>
       </div>
