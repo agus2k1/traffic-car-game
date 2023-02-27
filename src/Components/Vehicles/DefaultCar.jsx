@@ -30,6 +30,7 @@ const DefaultCar = ({
       position={position}
       rotation={rotation}
       userData={{ index, playerScore, angleMoved, active }}
+      onPointerEnter={() => console.log('asd')}
     >
       {/* Back Wheel */}
       <mesh position={backWheelPosition}>
