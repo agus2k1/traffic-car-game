@@ -3,7 +3,7 @@ import CarOption from './CarOption';
 
 const PlayerCarOptions = () => {
   return (
-    <group>
+    <group name="carOptions">
       <CarOption name="Default" />
       <CarOption name="Sapporo" />
       <CarOption name="Camaro" />
