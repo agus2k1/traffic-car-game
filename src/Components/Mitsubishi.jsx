@@ -1,12 +1,13 @@
 import React from 'react';
 import { useGLTF } from '@react-three/drei';
 
-const Mitsubishi = ({ position }) => {
+const Mitsubishi = ({ name, position, scale }) => {
   const { nodes, materials } = useGLTF('/mitsubishi-logo.glb');
   return (
     <group
       dispose={null}
-      scale={50}
+      name={name}
+      scale={scale}
       position={[position, 11, -300]}
       rotation={[0, 1.04, 0]}
     >
