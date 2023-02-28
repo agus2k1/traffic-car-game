@@ -25,16 +25,20 @@ const Wagon = ({
       rotation={rotation}
       userData={{ index, playerScore, angleMoved, active }}
     >
-      <mesh name="Cube" castShadow receiveShadow geometry={nodes.Cube.geometry}>
-        <meshLambertMaterial color={color} />
-      </mesh>
-      <mesh
-        name="Cube_1"
-        castShadow
-        receiveShadow
-        geometry={nodes.Cube_1.geometry}
-        material={materials.Window}
-      />
+      <group name="main">
+        <mesh castShadow receiveShadow geometry={nodes.Cube.geometry}>
+          <meshLambertMaterial color={color} />
+        </mesh>
+      </group>
+      <group name="glass">
+        <mesh
+          name="Cube_1"
+          castShadow
+          receiveShadow
+          geometry={nodes.Cube_1.geometry}
+          material={materials.Window}
+        />
+      </group>
       <group
         name="Wheels_back"
         position={[1.96, -0.85, -4.11]}
