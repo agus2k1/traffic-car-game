@@ -25,11 +25,11 @@ const Map = ({ mapWidth, mapHeight }) => {
   return (
     <>
       {displayCars ? (
-        <group>
+        <group name="field">
           <ExtrudedGeometry shape={field} />
         </group>
       ) : (
-        <group>
+        <group name="track">
           <mesh rotation={[-1.57, 0, 0]} position={[0, 0, 0]}>
             <planeGeometry attach="geometry" args={[mapWidth, mapHeight]} />
             <meshLambertMaterial attach="material" map={lineMarkingsTexture} />
