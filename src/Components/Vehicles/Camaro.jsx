@@ -5,6 +5,7 @@ const Camaro = ({
   playerRef,
   index,
   name,
+  type,
   color,
   angleMoved,
   playerScore,
@@ -19,6 +20,7 @@ const Camaro = ({
     <group
       ref={playerRef}
       name={name}
+      type={type}
       userData={{ index, playerScore, angleMoved, active }}
       dispose={null}
       rotation={rotation}
