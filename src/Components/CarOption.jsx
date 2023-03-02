@@ -8,8 +8,8 @@ import Mitsubishi from './Mitsubishi';
 import { useGameContext } from '../context/GameContext';
 import gsap from 'gsap';
 
-const CarOption = ({ name }) => {
-  const { scene, setDisplayCars } = useGameContext();
+const CarOption = ({ name, playerRef }) => {
+  const { scene, setDisplayCars, getPlayerCar } = useGameContext();
   const [carColor, setCarColor] = useState('white');
   const [logoScale, setLogoScale] = useState(0);
 
@@ -48,7 +48,7 @@ const CarOption = ({ name }) => {
   };
 
   const handleOnHover = ({ carColor, logoName, logoScale }) => {
-    gsap.to(carColor, { r: 0.4, g: 0.1, b: 0.1 });
+    gsap.to(carColor, { r: 1, g: 0, b: 0, duration: 0.5 });
 
     logoName.includes('chevrolet')
       ? gsap.to(logoScale, {
@@ -68,7 +68,7 @@ const CarOption = ({ name }) => {
   };
 
   const handleOnPointerLeave = ({ carColor, logoName, logoScale }) => {
-    gsap.to(carColor, { r: 1, g: 1, b: 1 });
+    gsap.to(carColor, { r: 1, g: 1, b: 1, duration: 0.5 });
     logoName.includes('chevrolet')
       ? gsap.to(logoScale, { x: 0, y: 0, z: 0, ease: 'power4', duration: 1.5 })
       : gsap.to(logoScale, { x: 0, y: 0, z: 0, ease: 'power4', duration: 1.5 });
@@ -76,7 +76,7 @@ const CarOption = ({ name }) => {
 
   const handleOnClick = () => {
     setDisplayCars(false);
-    console.log();
+    getPlayerCar(name, playerRef);
   };
 
   return (
@@ -86,7 +86,7 @@ const CarOption = ({ name }) => {
       onPointerLeave={() => handleOnPointerLeave(getObjectProps())}
       onClick={() => handleOnClick()}
     >
-      {name === 'Default' ? (
+      {name === 'default' ? (
         <>
           <DefaultCar
             props={carProps}
@@ -102,7 +102,7 @@ const CarOption = ({ name }) => {
             scale={logoScale}
           />
         </>
-      ) : name === 'Sapporo' ? (
+      ) : name === 'sapporo' ? (
         <>
           <Wagon
             scale={30}
