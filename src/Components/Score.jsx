@@ -5,6 +5,7 @@ import { useGameContext } from '../context/GameContext';
 
 const Score = ({ player }) => {
   const {
+    playerCar,
     displayCars,
     scene,
     runGame,
@@ -13,7 +14,6 @@ const Score = ({ player }) => {
     getVehiclesPosition,
   } = useGameContext();
   const { nodes, materials } = useGLTF('/numbers.glb');
-
   const [firstDigitObj, setFirstDigitObj] = useState(nodes['1']);
   const [secondDigitObj, setSecondDigitObj] = useState(nodes['0']);
   const [numberHasTwoDigits, setNumberHasTwoDigits] = useState(false);
@@ -25,15 +25,10 @@ const Score = ({ player }) => {
   // Gets all the vehicles in the scene
   useEffect(() => {
     if (scene) {
-      const objects = scene.children.filter(
-        (vehicle) => vehicle.type === 'Group'
+      const vehiclesObject = scene.children.find(
+        (object) => object.name === 'all-vehicles'
       );
-      const vehicles = objects.filter(
-        (vehicle) =>
-          vehicle.name === 'player' ||
-          vehicle.name.includes('car-') ||
-          vehicle.name.includes('truck-')
-      );
+      const vehicles = vehiclesObject.children;
       setAllVehicles(vehicles);
       setLapsCounter(0);
       setInterval(1);
@@ -41,17 +36,22 @@ const Score = ({ player }) => {
       setSecondDigitObj(nodes['0']);
       setNumberHasTwoDigits(false);
       setEnemyVehiclesCounter(1);
+      if (playerCar) {
+        player.current.userData.playerScore = 0;
+        player.current.userData.angleMoved = 0;
+      }
     }
-    // if (!displayCars) player.current.userData.playerScore = 0;
-  }, [scene, displayCars, restartGame]);
+  }, [scene, playerCar, restartGame]);
 
   useEffect(() => {
-    if (allVehicles || restartGame) {
-      lapsCounter > 0
-        ? getVehiclesPosition(allVehicles, displayCars, false)
-        : getVehiclesPosition(allVehicles, displayCars, true);
+    if (restartGame || allVehicles) {
+      if (lapsCounter > 0) {
+        getVehiclesPosition(allVehicles, displayCars, playerCar, false);
+      } else {
+        getVehiclesPosition(allVehicles, displayCars, playerCar, true);
+      }
     }
-  }, [allVehicles, enemyVehiclesCounter]);
+  }, [allVehicles, runGame, restartGame, enemyVehiclesCounter]);
 
   useFrame((state) => {
     if (runGame && !showCollisionMessage) {
@@ -59,28 +59,27 @@ const Score = ({ player }) => {
         const score = player.current.userData.playerScore;
         setLapsCounter(score);
 
-        const objects = state.scene.children.filter(
-          (vehicle) => vehicle.type === 'Group'
+        const allVehicles = state.scene.children.find(
+          (vehicle) => vehicle.name === 'all-vehicles'
         );
 
-        const allVehicles = objects.filter(
-          (object) =>
-            object.name.includes('car-') || object.name.includes('truck-')
+        const enemyVehicles = allVehicles.children.filter(
+          (vehicle) =>
+            vehicle.name.includes('car-') || vehicle.name.includes('truck-')
         );
 
-        const nextVehicleIndex = allVehicles.findIndex(
+        const nextVehicleIndex = enemyVehicles.findIndex(
           (vehicle) => !vehicle.userData.active
         );
 
         if (interval > 2) {
           nextVehicleIndex > -1
-            ? (allVehicles[nextVehicleIndex].userData.active = true)
+            ? (enemyVehicles[nextVehicleIndex].userData.active = true)
             : null;
           setInterval(1);
           setEnemyVehiclesCounter((prevNum) => prevNum + 1);
           console.log('spawn vehicle');
         } else {
-          console.log(interval);
           setInterval((prevNum) => prevNum + 1);
         }
 
