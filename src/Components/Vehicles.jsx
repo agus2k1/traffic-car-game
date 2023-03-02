@@ -5,12 +5,10 @@ import { carProps, truckProps } from '../assets/VehiclesData';
 import { useGameContext } from '../context/GameContext';
 import { useFrame } from '@react-three/fiber';
 import { getRandomVehicles } from '../assets/VehiclesAnimations';
-import Wagon from './Vehicles/Wagon';
-import Camaro from './Vehicles/Camaro';
 
-const Vehicles = ({ player }) => {
+const Vehicles = () => {
   const {
-    displayCars,
+    playerCar,
     enemyVehicles,
     runGame,
     showCollisionMessage,
@@ -19,43 +17,13 @@ const Vehicles = ({ player }) => {
   } = useGameContext();
 
   const [enemyVehiclesOnStart, setEnemyVehiclesOnStart] = useState(1);
-  const [playerCar, setPlayerCar] = useState(null);
-
-  const components = {
-    default: DefaultCar,
-    wagon: Wagon,
-    camaro: Camaro,
-  };
-
-  const getPlayerCar = () => {
-    const PlayerChoice = components['default'];
-
-    return (
-      <PlayerChoice
-        playerRef={player}
-        index={0}
-        name={'player'}
-        props={carProps}
-        color={0xa52523}
-        playerScore={0}
-        angleMoved={0}
-        active={true}
-      />
-    );
-  };
 
   useEffect(() => {
     if (!runGame) {
       setEnemyVehicles(getRandomVehicles(8));
       setEnemyVehiclesOnStart(1);
-      setPlayerCar(getPlayerCar());
     }
   }, [runGame]);
-
-  useEffect(() => {
-    setPlayerCar(getPlayerCar());
-    console.log('player');
-  }, [displayCars]);
 
   useFrame((state, delta) => {
     if (runGame && !showCollisionMessage) {
@@ -63,41 +31,9 @@ const Vehicles = ({ player }) => {
     }
   });
 
-  console.log(playerCar);
-
   return (
     <group name="all-vehicles">
-      {playerCar}
-      {/* <Camaro
-        playerRef={player}
-        index={0}
-        name={'player'}
-        props={carProps}
-        color={0xa52523}
-        playerScore={0}
-        angleMoved={0}
-        active={true}
-      /> */}
-      {/* <Wagon
-        playerRef={player}
-        index={0}
-        name={'player'}
-        props={carProps}
-        color={0xa52523}
-        playerScore={0}
-        angleMoved={0}
-        active={true}
-      /> */}
-      {/* <Car
-        playerRef={player}
-        index={0}
-        name={'player'}
-        props={carProps}
-        color={0xa52523}
-        playerScore={0}
-        angleMoved={0}
-        active={true}
-      /> */}
+      {playerCar && playerCar}
       {enemyVehicles.map((vehicle, index) => {
         const { name, type, color } = vehicle;
 
@@ -112,7 +48,6 @@ const Vehicles = ({ player }) => {
             key={name}
             index={index + 1}
             name={name}
-            props={carProps}
             color={color}
             angleMoved={0}
             active={active}
