@@ -18,7 +18,7 @@ const App = () => {
   const player = useRef();
 
   useEffect(() => {
-    controls();
+    if (!displayCars) controls();
 
     return () => {
       window.removeEventListener('keydown', () => {});
@@ -58,11 +58,11 @@ const App = () => {
           <Map mapWidth={cameraWidth} mapHeight={cameraHeight * 2} />
           {displayCars && (
             <Suspense fallback={null}>
-              <PlayerCarOptions />
+              <PlayerCarOptions player={player} />
             </Suspense>
           )}
           <Suspense fallback={null}>
-            <Vehicles player={player} />
+            <Vehicles />
             <Score player={player} />
           </Suspense>
         </Canvas>
