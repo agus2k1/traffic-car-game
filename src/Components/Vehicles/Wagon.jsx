@@ -5,6 +5,7 @@ const Wagon = ({
   playerRef,
   index,
   name,
+  type,
   color,
   angleMoved,
   playerScore,
@@ -20,6 +21,7 @@ const Wagon = ({
     <group
       ref={playerRef}
       name={name}
+      type={type}
       scale={scale}
       position={position}
       rotation={rotation}
