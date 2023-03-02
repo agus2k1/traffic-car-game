@@ -10,6 +10,7 @@ import Camaro from './Vehicles/Camaro';
 
 const Vehicles = ({ player }) => {
   const {
+    displayCars,
     enemyVehicles,
     runGame,
     showCollisionMessage,
@@ -18,23 +19,19 @@ const Vehicles = ({ player }) => {
   } = useGameContext();
 
   const [enemyVehiclesOnStart, setEnemyVehiclesOnStart] = useState(1);
+  const [playerCar, setPlayerCar] = useState(null);
 
-  useEffect(() => {
-    if (!runGame) {
-      setEnemyVehicles(getRandomVehicles(8));
-      setEnemyVehiclesOnStart(1);
-    }
-  }, [runGame]);
+  const components = {
+    default: DefaultCar,
+    wagon: Wagon,
+    camaro: Camaro,
+  };
 
-  useFrame((state, delta) => {
-    if (runGame && !showCollisionMessage) {
-      animations(state, delta);
-    }
-  });
+  const getPlayerCar = () => {
+    const PlayerChoice = components['default'];
 
-  return (
-    <>
-      <Camaro
+    return (
+      <PlayerChoice
         playerRef={player}
         index={0}
         name={'player'}
@@ -44,6 +41,43 @@ const Vehicles = ({ player }) => {
         angleMoved={0}
         active={true}
       />
+    );
+  };
+
+  useEffect(() => {
+    if (!runGame) {
+      setEnemyVehicles(getRandomVehicles(8));
+      setEnemyVehiclesOnStart(1);
+      setPlayerCar(getPlayerCar());
+    }
+  }, [runGame]);
+
+  useEffect(() => {
+    setPlayerCar(getPlayerCar());
+    console.log('player');
+  }, [displayCars]);
+
+  useFrame((state, delta) => {
+    if (runGame && !showCollisionMessage) {
+      animations(state, delta);
+    }
+  });
+
+  console.log(playerCar);
+
+  return (
+    <group name="all-vehicles">
+      {playerCar}
+      {/* <Camaro
+        playerRef={player}
+        index={0}
+        name={'player'}
+        props={carProps}
+        color={0xa52523}
+        playerScore={0}
+        angleMoved={0}
+        active={true}
+      /> */}
       {/* <Wagon
         playerRef={player}
         index={0}
@@ -95,7 +129,7 @@ const Vehicles = ({ player }) => {
           />
         );
       })}
-    </>
+    </group>
   );
 };
 
