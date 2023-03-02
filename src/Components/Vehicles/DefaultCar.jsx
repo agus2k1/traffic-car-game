@@ -1,4 +1,5 @@
 import React from 'react';
+import { carProps } from '../../assets/VehiclesData';
 import {
   getCarFrontTexture,
   getCarSideTexture,
@@ -8,7 +9,7 @@ const DefaultCar = ({
   playerRef,
   index,
   name,
-  props,
+  type,
   color,
   angleMoved,
   playerScore,
@@ -18,14 +19,15 @@ const DefaultCar = ({
   rotation,
 }) => {
   const { backWheelPosition, frontWheelPosition, wheelArgs, wheelColor } =
-    props.wheels;
-  const { mainPosition, mainArgs } = props.main;
-  const { cabinPosition, cabinArgs, cabinColor } = props.cabin;
+    carProps.wheels;
+  const { mainPosition, mainArgs } = carProps.main;
+  const { cabinPosition, cabinArgs, cabinColor } = carProps.cabin;
 
   return (
     <group
       ref={playerRef}
       name={name}
+      type={type}
       scale={scale}
       position={position}
       rotation={rotation}
