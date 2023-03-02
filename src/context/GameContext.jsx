@@ -18,6 +18,7 @@ export const GameProvider = ({ children }) => {
   const [enemyVehicles, setEnemyVehicles] = useState([]);
   const [showCollisionMessage, setShowCollisionMessage] = useState(false);
   const [displayCars, setDisplayCars] = useState(true);
+  const [playerCar, setPlayerCar] = useState('Default');
 
   let accelerate = false;
   let decelerate = false;
@@ -68,7 +69,11 @@ export const GameProvider = ({ children }) => {
     });
   };
 
-  const getVehiclesPosition = (vehicles, isGameStarting) => {
+  const getVehiclesPosition = (vehicles, displayCars, isGameStarting) => {
+    vehicles.forEach((vehicle) => {
+      vehicle.visible = displayCars ? false : true;
+    });
+
     if (isGameStarting) {
       const activeVehicles = vehicles.filter(
         (vehicle) => vehicle.userData.active
@@ -79,7 +84,6 @@ export const GameProvider = ({ children }) => {
     }
 
     const nextVehicles = vehicles.filter((vehicle) => !vehicle.userData.active);
-
     nextVehicles?.map((vehicle, index) => {
       vehicle.position.x = -600 - 200 * index;
       vehicle.position.z = 300;
@@ -118,6 +122,7 @@ export const GameProvider = ({ children }) => {
         animations,
         setEnemyVehicles,
         setScene,
+        setDisplayCars,
       }}
     >
       {children}
