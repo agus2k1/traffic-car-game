@@ -7,7 +7,7 @@ const Lights = () => {
   useHelper(light, DirectionalLightHelper, 1, 'cyan');
 
   return (
-    <>
+    <group name="lights">
       <ambientLight intensity={1} />
       <directionalLight
         position={[100, 400, 300]}
@@ -15,7 +15,7 @@ const Lights = () => {
         color={'#ffffff'}
         ref={light}
       />
-    </>
+    </group>
   );
 };
 
