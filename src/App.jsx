@@ -36,7 +36,7 @@ const App = () => {
       )}
       <div className={`game ${showCollisionMessage ? 'lost' : ''}`}>
         <Canvas
-          onCreated={({ scene }) => {
+          onCreated={({ scene, camera }) => {
             setScene(scene);
           }}
           orthographic
@@ -54,26 +54,26 @@ const App = () => {
           className="game-canvas"
         >
           <Lights />
-          <OrbitControls />
-          {!displayCars && (
+          <OrbitControls target={[0, 0, 0]} />
+          <Map mapWidth={cameraWidth} mapHeight={cameraHeight * 2} />
+          {displayCars && (
             <Suspense fallback={null}>
-              <Vehicles player={player} />
-              <Score player={player} />
+              <PlayerCarOptions />
             </Suspense>
           )}
           <Suspense fallback={null}>
-            <Map mapWidth={cameraWidth} mapHeight={cameraHeight * 2} />
-            <PlayerCarOptions />
+            <Vehicles player={player} />
+            <Score player={player} />
           </Suspense>
         </Canvas>
       </div>
-      <div className="page hidden">
+      {/* <div className="page hidden">
         <div className="page-wrapper">
           <section className="hero">
             <button>Animacion</button>
           </section>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };
