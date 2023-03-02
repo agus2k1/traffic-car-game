@@ -16,19 +16,31 @@ export const animateVehicles = (state, delta, playerSpeed) => {
   hitZonesArray = [];
 
   const children = state.scene.children;
-  const vehicles = children.filter((child) => child.type === 'Group');
+  const vehiclesObject = children.find(
+    (child) => child.name === 'all-vehicles'
+  );
+  const vehicles = vehiclesObject.children;
 
   vehicles.map((vehicle) => {
     if (vehicle.userData.active) {
       if (vehicle.name === 'player') {
         const player = vehicle;
+        const carType = vehicle.type;
         player.userData.playerScore = getScore(player.userData.angleMoved);
-        setVehicle(player, player.name, playerSpeed, delta, Math.PI * 2);
+        setVehicle(
+          player,
+          player.name,
+          carType,
+          playerSpeed,
+          delta,
+          Math.PI * 2
+        );
       } else if (vehicle.name.includes('car')) {
         const car = vehicle;
         setVehicle(
           car,
           car.name,
+          'car',
           carSpeed,
           delta,
           Math.PI / 2 + carSpaceBetween
@@ -38,6 +50,7 @@ export const animateVehicles = (state, delta, playerSpeed) => {
         setVehicle(
           truck,
           truck.name,
+          'truck',
           truckSpeed,
           delta,
           -Math.PI / 2 + truckSpaceBetween
@@ -49,7 +62,7 @@ export const animateVehicles = (state, delta, playerSpeed) => {
   });
 };
 
-const setVehicle = (object, name, speed, delta, angleInitial) => {
+const setVehicle = (object, name, type, speed, delta, angleInitial) => {
   name === 'player'
     ? (object.userData.angleMoved += speed * delta)
     : name.includes('car')
@@ -74,7 +87,7 @@ const setVehicle = (object, name, speed, delta, angleInitial) => {
       : Math.sin(totalAngle) * (trackRadius - 30);
 
   const y =
-    name === 'player' || name.includes('car')
+    type === 'sapporo' || type === 'camaro'
       ? -totalAngle
       : -totalAngle - Math.PI / 2;
 
@@ -166,19 +179,27 @@ export const getRandomVehicles = (amount) => {
 
 // -----------------------Position vehicles-----------------------
 
-export const initialPosition = (vehicle) => {
+export const initialPosition = (vehicle, carType) => {
   if (vehicle.name === 'player') {
     const player = vehicle;
     player.position.x = Math.cos(Math.PI * 2) * (trackRadius + 30) + arcCenterX;
     player.position.z = Math.sin(Math.PI * 2) * (trackRadius + 30);
-    player.rotation.y = 0;
+
+    if (carType === 'DefaultCar') {
+      player.rotation.y = -Math.PI / 2;
+    } else if (carType === 'Wagon') {
+      player.rotation.y = 0;
+    } else if (carType === 'Camaro') {
+      player.rotation.y = 0;
+      player.rotation.x = 0;
+    }
   } else if (vehicle.name.includes('car')) {
     const car = vehicle;
     car.position.x =
       Math.cos(Math.PI / 2 + carSpaceBetween) * (trackRadius + 30) - arcCenterX;
     car.position.z =
       Math.sin(Math.PI / 2 + carSpaceBetween) * (trackRadius + 30);
-    car.rotation.y = Math.PI / 3 + carSpaceBetween;
+    car.rotation.y = -Math.PI / 5 + carSpaceBetween;
   } else if (vehicle.name.includes('truck')) {
     const truck = vehicle;
     truck.position.x =
