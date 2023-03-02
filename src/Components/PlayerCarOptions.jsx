@@ -1,12 +1,12 @@
 import React from 'react';
 import CarOption from './CarOption';
 
-const PlayerCarOptions = () => {
+const PlayerCarOptions = ({ player }) => {
   return (
     <group name="carOptions">
-      <CarOption name="Default" />
-      <CarOption name="Sapporo" />
-      <CarOption name="Camaro" />
+      <CarOption name="default" playerRef={player} />
+      <CarOption name="sapporo" playerRef={player} />
+      <CarOption name="camaro" playerRef={player} />
     </group>
   );
 };
