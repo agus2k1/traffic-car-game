@@ -5,6 +5,7 @@ import { useGameContext } from '../context/GameContext';
 
 const Score = ({ player }) => {
   const {
+    displayCars,
     scene,
     runGame,
     restartGame,
@@ -27,9 +28,13 @@ const Score = ({ player }) => {
       const objects = scene.children.filter(
         (vehicle) => vehicle.type === 'Group'
       );
-      const vehicles = objects.filter((vehicle) => vehicle.name);
+      const vehicles = objects.filter(
+        (vehicle) =>
+          vehicle.name === 'player' ||
+          vehicle.name.includes('car-') ||
+          vehicle.name.includes('truck-')
+      );
       setAllVehicles(vehicles);
-      player.current.userData.playerScore = 0;
       setLapsCounter(0);
       setInterval(1);
       setFirstDigitObj(nodes['1']);
@@ -37,13 +42,14 @@ const Score = ({ player }) => {
       setNumberHasTwoDigits(false);
       setEnemyVehiclesCounter(1);
     }
-  }, [scene, restartGame]);
+    // if (!displayCars) player.current.userData.playerScore = 0;
+  }, [scene, displayCars, restartGame]);
 
   useEffect(() => {
     if (allVehicles || restartGame) {
       lapsCounter > 0
-        ? getVehiclesPosition(allVehicles, false)
-        : getVehiclesPosition(allVehicles, true);
+        ? getVehiclesPosition(allVehicles, displayCars, false)
+        : getVehiclesPosition(allVehicles, displayCars, true);
     }
   }, [allVehicles, enemyVehiclesCounter]);
 
@@ -53,8 +59,13 @@ const Score = ({ player }) => {
         const score = player.current.userData.playerScore;
         setLapsCounter(score);
 
-        const allVehicles = state.scene.children.filter(
+        const objects = state.scene.children.filter(
           (vehicle) => vehicle.type === 'Group'
+        );
+
+        const allVehicles = objects.filter(
+          (object) =>
+            object.name.includes('car-') || object.name.includes('truck-')
         );
 
         const nextVehicleIndex = allVehicles.findIndex(
@@ -88,11 +99,12 @@ const Score = ({ player }) => {
 
   return (
     <group
+      name="score"
       position={[260, 11.5, -15]}
       scale={[80, 80, 80]}
       rotation={[0, 3.135, 0]}
     >
-      {numberHasTwoDigits && (
+      {numberHasTwoDigits && !displayCars && (
         <>
           <mesh
             castShadow
@@ -110,7 +122,7 @@ const Score = ({ player }) => {
           />
         </>
       )}
-      {!numberHasTwoDigits && (
+      {!numberHasTwoDigits && !displayCars && (
         <mesh
           castShadow
           receiveShadow
