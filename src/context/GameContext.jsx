@@ -4,6 +4,9 @@ import {
   checkCollision,
   initialPosition,
 } from '../assets/VehiclesAnimations';
+import DefaultCar from '../Components/Vehicles/DefaultCar';
+import Wagon from '../Components/Vehicles/Wagon';
+import Camaro from '../Components/Vehicles/Camaro';
 
 const GameContext = React.createContext(null);
 
@@ -18,7 +21,30 @@ export const GameProvider = ({ children }) => {
   const [enemyVehicles, setEnemyVehicles] = useState([]);
   const [showCollisionMessage, setShowCollisionMessage] = useState(false);
   const [displayCars, setDisplayCars] = useState(true);
-  const [playerCar, setPlayerCar] = useState('Default');
+  const [playerCar, setPlayerCar] = useState();
+
+  const components = {
+    default: DefaultCar,
+    sapporo: Wagon,
+    camaro: Camaro,
+  };
+
+  const getPlayerCar = (carChoice, playerRef) => {
+    const PlayerChoice = components[carChoice];
+
+    setPlayerCar(
+      <PlayerChoice
+        playerRef={playerRef}
+        index={0}
+        name={'player'}
+        type={carChoice}
+        color={0xa52523}
+        playerScore={0}
+        angleMoved={0}
+        active={true}
+      />
+    );
+  };
 
   let accelerate = false;
   let decelerate = false;
@@ -69,17 +95,24 @@ export const GameProvider = ({ children }) => {
     });
   };
 
-  const getVehiclesPosition = (vehicles, displayCars, isGameStarting) => {
+  const getVehiclesPosition = (
+    vehicles,
+    displayCars,
+    playerCar,
+    isGameStarting
+  ) => {
     vehicles.forEach((vehicle) => {
       vehicle.visible = displayCars ? false : true;
     });
-
     if (isGameStarting) {
       const activeVehicles = vehicles.filter(
         (vehicle) => vehicle.userData.active
       );
+
+      const carType = playerCar?.type.name;
+
       activeVehicles.map((vehicle) => {
-        initialPosition(vehicle);
+        initialPosition(vehicle, carType);
       });
     }
 
@@ -87,7 +120,6 @@ export const GameProvider = ({ children }) => {
     nextVehicles?.map((vehicle, index) => {
       vehicle.position.x = -600 - 200 * index;
       vehicle.position.z = 300;
-      vehicle.rotation.y = Math.PI / 2;
     });
   };
 
@@ -114,6 +146,7 @@ export const GameProvider = ({ children }) => {
         scene,
         runGame,
         restartGame,
+        playerCar,
         enemyVehicles,
         showCollisionMessage,
         displayCars,
@@ -123,6 +156,8 @@ export const GameProvider = ({ children }) => {
         setEnemyVehicles,
         setScene,
         setDisplayCars,
+        setPlayerCar,
+        getPlayerCar,
       }}
     >
       {children}
