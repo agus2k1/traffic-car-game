@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { carProps } from '../assets/VehiclesData';
 import Camaro from './Vehicles/Camaro';
 import DefaultCar from './Vehicles/DefaultCar';
@@ -9,7 +9,7 @@ import { useGameContext } from '../context/GameContext';
 import gsap from 'gsap';
 
 const CarOption = ({ name }) => {
-  const { scene } = useGameContext();
+  const { scene, setDisplayCars } = useGameContext();
   const [carColor, setCarColor] = useState('white');
   const [logoScale, setLogoScale] = useState(0);
 
@@ -48,7 +48,7 @@ const CarOption = ({ name }) => {
   };
 
   const handleOnHover = ({ carColor, logoName, logoScale }) => {
-    gsap.to(carColor, { r: 1, g: 1, b: 0, ease: 'back' });
+    gsap.to(carColor, { r: 0.4, g: 0.1, b: 0.1 });
 
     logoName.includes('chevrolet')
       ? gsap.to(logoScale, {
@@ -74,12 +74,17 @@ const CarOption = ({ name }) => {
       : gsap.to(logoScale, { x: 0, y: 0, z: 0, ease: 'power4', duration: 1.5 });
   };
 
+  const handleOnClick = () => {
+    setDisplayCars(false);
+    console.log();
+  };
+
   return (
     <group
       name={name}
       onPointerEnter={() => handleOnHover(getObjectProps())}
       onPointerLeave={() => handleOnPointerLeave(getObjectProps())}
-      on
+      onClick={() => handleOnClick()}
     >
       {name === 'Default' ? (
         <>
