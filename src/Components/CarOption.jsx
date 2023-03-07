@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { carProps } from '../assets/VehiclesData';
 import Camaro from './Vehicles/Camaro';
 import DefaultCar from './Vehicles/DefaultCar';
 import Wagon from './Vehicles/Wagon';
-import Chevrolet from './Chevrolet';
-import Mitsubishi from './Mitsubishi';
+import Chevrolet from './Logos/Chevrolet';
+import Mitsubishi from './Logos/Mitsubishi';
 import { useGameContext } from '../context/GameContext';
 import gsap from 'gsap';
 
 const CarOption = ({ name, playerRef }) => {
   const { scene, setDisplayCars, getPlayerCar } = useGameContext();
-  const [carColor, setCarColor] = useState('white');
-  const [logoScale, setLogoScale] = useState(0);
+
+  const carColor = 'white';
+  const logoScale = 0;
 
   const defaultCarX = 450;
   const sapporoX = 0;
