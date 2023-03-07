@@ -7,6 +7,7 @@ import Map from './Components/Map';
 import Score from './Components/Score';
 import PlayerCarOptions from './Components/PlayerCarOptions';
 import { useGameContext } from './context/GameContext';
+import Github from './Components/Logos/Github';
 
 const App = () => {
   const { displayCars, restartGame, showCollisionMessage, controls, setScene } =
@@ -59,6 +60,7 @@ const App = () => {
           {displayCars && (
             <Suspense fallback={null}>
               <PlayerCarOptions player={player} />
+              <Github />
             </Suspense>
           )}
           <Suspense fallback={null}>
