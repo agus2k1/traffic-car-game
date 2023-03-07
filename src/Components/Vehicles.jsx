@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DefaultCar from './Vehicles/DefaultCar';
 import DefaultTruck from './Vehicles/DefaultTruck';
-import { carProps, truckProps } from '../assets/VehiclesData';
+import { truckProps } from '../assets/VehiclesData';
 import { useGameContext } from '../context/GameContext';
 import { useFrame } from '@react-three/fiber';
 import { getRandomVehicles } from '../assets/VehiclesAnimations';
