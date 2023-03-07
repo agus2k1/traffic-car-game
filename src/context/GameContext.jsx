@@ -58,6 +58,7 @@ export const GameProvider = ({ children }) => {
           if (!runGame) {
             setRunGame(true);
             setRestartGame(false);
+            setShowCollisionMessage(false);
           }
           accelerate = true;
           return;
@@ -73,7 +74,6 @@ export const GameProvider = ({ children }) => {
       if (e.key === 'R' || e.key === 'r') {
         if (!runGame && showCollisionMessage) {
           setShowCollisionMessage(false);
-          setRestartGame(true);
         }
         return;
       }
@@ -137,6 +137,7 @@ export const GameProvider = ({ children }) => {
     if (checkCollision()) {
       setShowCollisionMessage(true);
       setRunGame(false);
+      setRestartGame(true);
     }
   };
 
