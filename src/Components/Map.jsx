@@ -8,10 +8,11 @@ import {
   getOuterField,
   getField,
 } from '../assets/MapTexture';
+import PressUp from './Texts/PressUp';
 import { useGameContext } from '../context/GameContext';
 
 const Map = ({ mapWidth, mapHeight }) => {
-  const { displayCars } = useGameContext();
+  const { displayCars, runGame } = useGameContext();
 
   const lineMarkingsTexture = getLineMarkings(mapWidth, mapHeight);
 
@@ -38,6 +39,7 @@ const Map = ({ mapWidth, mapHeight }) => {
           <ExtrudedGeometry shape={rightIsland} />
           <ExtrudedGeometry shape={middleIsland} />
           <ExtrudedGeometry shape={outerField} />
+          {!runGame && <PressUp />}
         </group>
       )}
     </>
