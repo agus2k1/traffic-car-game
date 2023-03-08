@@ -1,12 +1,13 @@
 import React from 'react';
 import { useGLTF } from '@react-three/drei';
 
-const Github = () => {
+const Github = ({ name, position, scale }) => {
   const { nodes, materials } = useGLTF('/github-logo.glb');
   return (
     <group
-      scale={30}
-      position={[0, 11, -400]}
+      name={name}
+      scale={scale}
+      position={[position, 11, -300]}
       rotation={[0, Math.PI, 0]}
       dispose={null}
     >
